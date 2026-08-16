@@ -1,0 +1,141 @@
+/* ============================================
+   GGLOG LOG PAGE — Diary Entry Composer Styles
+   ============================================ */
+
+/* ---- Log Section Card ---- */
+
+.log-section {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 24px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .log-section {
+    padding: 16px;
+  }
+}
+
+/* ---- Cover Placeholder ---- */
+
+.log-cover-placeholder {
+  background: #0e0e0e;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.log-cover-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(204, 255, 0, 0.01) 2px,
+    rgba(204, 255, 0, 0.01) 4px
+  );
+  pointer-events: none;
+}
+
+/* ---- Calendar Day Hover ---- */
+
+.calendar-day {
+  position: relative;
+}
+
+.calendar-day::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease;
+  pointer-events: none;
+}
+
+.calendar-day:not(:disabled):hover::after {
+  border-color: rgba(204, 255, 0, 0.2);
+}
+
+/* ---- Rating Star Glow ---- */
+
+.rating-star {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rating-star:hover {
+  filter: brightness(1.1);
+}
+
+/* ---- Archive Button Spinner ---- */
+
+@keyframes archiveSpin {
+  0% { content: "⠋"; }
+  10% { content: "⠙"; }
+  20% { content: "⠹"; }
+  30% { content: "⠸"; }
+  40% { content: "⠼"; }
+  50% { content: "⠴"; }
+  60% { content: "⠦"; }
+  70% { content: "⠧"; }
+  80% { content: "⠇"; }
+  90% { content: "⠏"; }
+}
+
+.archive-spinner::before {
+  content: "⠋";
+  animation: archiveSpin 0.8s steps(1) infinite;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* ---- Stagger Fade-In for Log Sections ---- */
+
+@keyframes logSectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.log-section-animate {
+  opacity: 0;
+  animation: logSectionFade 0.4s ease forwards;
+}
+
+/* ---- Log Page Grid Background ---- */
+
+.log-grid-bg {
+  position: relative;
+}
+
+.log-grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image:
+    linear-gradient(rgba(204, 255, 0, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204, 255, 0, 0.3) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ---- Preview Card Pulse on Update ---- */
+
+@keyframes previewPulse {
+  0% { border-color: var(--color-lime); }
+  50% { border-color: var(--color-border); }
+  100% { border-color: var(--color-border); }
+}
+
+.preview-pulse {
+  animation: previewPulse 0.6s ease;
+}

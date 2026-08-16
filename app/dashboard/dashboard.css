@@ -1,0 +1,296 @@
+/* ============================================
+   GGLOG PROFILE — Player Archive Styles
+   ============================================ */
+
+/* ---- Grid Background Pattern ---- */
+
+.profile-grid-bg {
+  position: relative;
+}
+
+.profile-grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image:
+    linear-gradient(rgba(204, 255, 0, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204, 255, 0, 0.3) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ---- Staggered Fade-In ---- */
+
+@keyframes profileFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-fade-1 { opacity: 0; animation: profileFadeIn 0.5s ease 0.1s forwards; }
+.profile-fade-2 { opacity: 0; animation: profileFadeIn 0.5s ease 0.25s forwards; }
+.profile-fade-3 { opacity: 0; animation: profileFadeIn 0.5s ease 0.4s forwards; }
+.profile-fade-4 { opacity: 0; animation: profileFadeIn 0.5s ease 0.55s forwards; }
+.profile-fade-5 { opacity: 0; animation: profileFadeIn 0.5s ease 0.7s forwards; }
+
+/* ---- Diary Timeline ---- */
+
+.diary-timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.diary-timeline::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #1e1e1e;
+}
+
+.diary-timeline-dot {
+  position: absolute;
+  left: -19px;
+  top: 8px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #2a2a2a;
+  background: #050505;
+  z-index: 1;
+}
+
+.diary-timeline-dot.active {
+  border-color: var(--color-lime);
+  box-shadow: 0 0 8px rgba(204, 255, 0, 0.3);
+}
+
+/* ---- Status Badges ---- */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-space);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  line-height: 1;
+}
+
+.status-completed {
+  background: rgba(204, 255, 0, 0.12);
+  color: var(--color-lime);
+  border: 1px solid rgba(204, 255, 0, 0.25);
+}
+
+.status-playing {
+  background: rgba(255, 77, 0, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 77, 0, 0.25);
+}
+
+.status-on_hold,
+.status-dropped {
+  background: rgba(138, 132, 112, 0.1);
+  color: var(--color-text-dim);
+  border: 1px solid rgba(138, 132, 112, 0.2);
+}
+
+.status-backlog {
+  background: rgba(90, 86, 71, 0.1);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(90, 86, 71, 0.2);
+}
+
+/* ---- Star Rating ---- */
+
+.star-rating {
+  display: inline-flex;
+  gap: 1px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.star-filled {
+  color: var(--color-lime);
+  text-shadow: 0 0 4px rgba(204, 255, 0, 0.3);
+}
+
+.star-empty {
+  color: #2a2a2a;
+}
+
+/* ---- Genre Progress Bar ---- */
+
+.genre-bar-track {
+  height: 8px;
+  background: #0e0e0e;
+  border: 1px solid #1a1a1a;
+  flex: 1;
+}
+
+.genre-bar-fill {
+  height: 100%;
+  transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Pixel segments */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 4px,
+    rgba(0, 0, 0, 0.25) 4px,
+    rgba(0, 0, 0, 0.25) 6px
+  );
+}
+
+.genre-bar-fill.fill-lime {
+  background-color: var(--color-lime);
+  box-shadow: 0 0 6px rgba(204, 255, 0, 0.2);
+}
+
+.genre-bar-fill.fill-warning {
+  background-color: var(--color-warning);
+  box-shadow: 0 0 6px rgba(255, 77, 0, 0.15);
+}
+
+.genre-bar-fill.fill-muted {
+  background-color: var(--color-text-muted);
+}
+
+.genre-bar-fill.fill-dim {
+  background-color: #3a3a3a;
+}
+
+/* ---- Collection Card Image Grid ---- */
+
+.collection-img-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+  aspect-ratio: 16 / 9;
+}
+
+.collection-img-placeholder {
+  background: #161616;
+  border: 1px solid #1a1a1a;
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-img-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.06) 1px,
+    rgba(0, 0, 0, 0.06) 2px
+  );
+  pointer-events: none;
+}
+
+/* ---- Online Badge Pulse ---- */
+
+@keyframes onlinePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.online-badge {
+  animation: onlinePulse 2s ease-in-out infinite;
+}
+
+/* ---- Profile Tab Underline ---- */
+
+.profile-tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-lime);
+  box-shadow: 0 0 8px rgba(204, 255, 0, 0.3);
+}
+
+/* ---- Diary Card Stagger ---- */
+
+@keyframes diarySlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.diary-entry-animate {
+  opacity: 0;
+  animation: diarySlideIn 0.45s ease forwards;
+}
+
+/* ---- Avatar Placeholder ---- */
+
+.avatar-placeholder {
+  position: relative;
+  background: #0e0e0e;
+  border: 2px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(204, 255, 0, 0.015) 2px,
+    rgba(204, 255, 0, 0.015) 4px
+  );
+  pointer-events: none;
+}
+
+/* ---- Diary Image Placeholder ---- */
+
+.diary-img-placeholder {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.diary-img-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.08) 1px,
+    rgba(0, 0, 0, 0.08) 2px
+  );
+  pointer-events: none;
+}

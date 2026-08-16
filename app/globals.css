@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+/* ============================================
+   GGLOG DESIGN SYSTEM — Retro-Futuristic CRT
+   ============================================ */
+
+@theme inline {
+  --color-bg: #050505;
+  --color-surface: #101010;
+  --color-surface-light: #161616;
+  --color-surface-lighter: #1e1e1e;
+  --color-lime: #CCFF00;
+  --color-lime-dim: #99cc00;
+  --color-warning: #FF4D00;
+  --color-text: #EAE0C8;
+  --color-text-dim: #8a8470;
+  --color-text-muted: #5a5647;
+  --color-border: #2a2a2a;
+  --color-border-active: #3a3a3a;
+
+  --font-pixel: var(--font-press-start), "Press Start 2P", monospace;
+  --font-terminal: var(--font-vt323), "VT323", monospace;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+  --font-space: var(--font-space-mono), "Space Mono", monospace;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a #0a0a0a;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #CCFF00;
+}
+
+::selection {
+  background: rgba(204, 255, 0, 0.25);
+  color: #CCFF00;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #050505;
+  color: #EAE0C8;
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+}
+
+/* ============================================
+   CRT SCANLINES
+   ============================================ */
+
+.crt-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* ============================================
+   FILM GRAIN NOISE
+   ============================================ */
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.035;
+  animation: noise 0.5s steps(8) infinite;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+@keyframes noise {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -2%); }
+  20% { transform: translate(2%, 1%); }
+  30% { transform: translate(-1%, 2%); }
+  40% { transform: translate(1%, -1%); }
+  50% { transform: translate(-2%, 2%); }
+  60% { transform: translate(2%, -2%); }
+  70% { transform: translate(-1%, -1%); }
+  80% { transform: translate(1%, 2%); }
+  90% { transform: translate(-2%, 1%); }
+}
+
+/* ============================================
+   LIME GLOW UTILITIES
+   ============================================ */
+
+.glow-lime {
+  text-shadow:
+    0 0 8px rgba(204, 255, 0, 0.4),
+    0 0 20px rgba(204, 255, 0, 0.15),
+    0 0 40px rgba(204, 255, 0, 0.05);
+}
+
+.glow-lime-strong {
+  text-shadow:
+    0 0 10px rgba(204, 255, 0, 0.6),
+    0 0 30px rgba(204, 255, 0, 0.3),
+    0 0 60px rgba(204, 255, 0, 0.1);
+}
+
+.glow-lime-box {
+  box-shadow:
+    0 0 10px rgba(204, 255, 0, 0.15),
+    0 0 30px rgba(204, 255, 0, 0.05),
+    inset 0 0 10px rgba(204, 255, 0, 0.03);
+}
+
+.glow-warning-box {
+  box-shadow:
+    0 0 10px rgba(255, 77, 0, 0.2),
+    0 0 20px rgba(255, 77, 0, 0.05);
+}
+
+/* ============================================
+   CURSOR BLINK
+   ============================================ */
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ============================================
+   MICRO GLITCH ANIMATIONS
+   ============================================ */
+
+@keyframes glitch-shift {
+  0%, 95%, 100% { transform: translate(0, 0); }
+  96% { transform: translate(-2px, 1px); }
+  97% { transform: translate(2px, -1px); }
+  98% { transform: translate(-1px, -1px); }
+  99% { transform: translate(1px, 1px); }
+}
+
+@keyframes glitch-flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  95% { opacity: 0.6; }
+  96% { opacity: 1; }
+}
+
+@keyframes rgb-split {
+  0%, 94%, 100% {
+    text-shadow: none;
+  }
+  95% {
+    text-shadow: -2px 0 #ff0000, 2px 0 #00ffff;
+  }
+  96% {
+    text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+  }
+  97% {
+    text-shadow: -1px 1px #ff0000, 1px -1px #00ffff;
+  }
+}
+
+.glitch-periodic {
+  animation: glitch-flicker 10s infinite, glitch-shift 12s infinite;
+}
+
+.rgb-split-hover:hover {
+  animation: rgb-split 0.3s steps(3) infinite;
+}
+
+/* ============================================
+   PIXEL BORDER UTILITIES
+   ============================================ */
+
+.pixel-border {
+  border: 1px solid #2a2a2a;
+  clip-path: polygon(
+    0 8px, 8px 8px, 8px 0,
+    calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+.pixel-border-sm {
+  border: 1px solid #2a2a2a;
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+/* ============================================
+   SCANLINE OVERLAY FOR CARDS
+   ============================================ */
+
+.scanline-overlay {
+  position: relative;
+}
+
+.scanline-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.08) 1px,
+    rgba(0, 0, 0, 0.08) 2px
+  );
+  z-index: 2;
+}
+
+/* ============================================
+   PROGRESS BAR (XP)
+   ============================================ */
+
+.xp-bar-track {
+  background: #0a0a0a;
+  border: 1px solid #2a2a2a;
+  height: 12px;
+  position: relative;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #99cc00, #CCFF00);
+  box-shadow: 0 0 8px rgba(204, 255, 0, 0.3);
+  transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Pixel segments */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 6px,
+    rgba(0, 0, 0, 0.2) 6px,
+    rgba(0, 0, 0, 0.2) 8px
+  );
+}
+
+/* ============================================
+   BUTTON PRESS EFFECT
+   ============================================ */
+
+.btn-press {
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-press:active {
+  transform: translateY(2px);
+  box-shadow: none !important;
+}
+
+/* ============================================
+   SKILL TREE NODE
+   ============================================ */
+
+.skill-node {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #2a2a2a;
+  background: #101010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+}
+
+.skill-node.active {
+  border-color: #CCFF00;
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.2), 0 0 30px rgba(204, 255, 0, 0.05);
+}
+
+.skill-node-line {
+  position: absolute;
+  background: #2a2a2a;
+  transition: background 0.4s ease;
+}
+
+.skill-node-line.active {
+  background: #CCFF00;
+  box-shadow: 0 0 6px rgba(204, 255, 0, 0.3);
+}
+
+/* ============================================
+   RESPONSIVE HELPERS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .pixel-border {
+    clip-path: polygon(
+      0 4px, 4px 4px, 4px 0,
+      calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+      100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px),
+      0 calc(100% - 4px)
+    );
+  }
+}
