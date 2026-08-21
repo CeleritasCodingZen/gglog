@@ -7,13 +7,14 @@
 // ARCHIVING → SYNCING → COMPLETE. No API call.
 // ============================================
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface ArchiveButtonProps {
   onArchive: () => Promise<void>;
   onSaveDraft: () => void;
   onCancel: () => void;
   disabled?: boolean;
+  archiving?: boolean;
 }
 
 type ArchivePhase = "idle" | "archiving" | "syncing" | "complete";
@@ -23,23 +24,61 @@ export default function ArchiveButton({
   onSaveDraft,
   onCancel,
   disabled = false,
+  archiving = false,
 }: ArchiveButtonProps) {
   const [phase, setPhase] = useState<ArchivePhase>("idle");
+  const [isPending, setIsPending] = useState(false);
+
+  useEffect(() => {
+    if (archiving) {
+      let isCancelled = false;
+      const runPhases = async () => {
+        if (isCancelled) return;
+        setPhase("archiving");
+        await new Promise((r) => setTimeout(r, 450));
+
+        if (isCancelled) return;
+        setPhase("syncing");
+        await new Promise((r) => setTimeout(r, 450));
+
+        if (isCancelled) return;
+        setPhase("complete");
+      };
+      runPhases();
+      return () => {
+        isCancelled = true;
+      };
+    } else {
+      const timer = setTimeout(() => {
+        setPhase((prev) => (prev !== "idle" ? "idle" : prev));
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [archiving]);
 
   const handleArchive = useCallback(async () => {
-    if (phase !== "idle" || disabled) return;
+    if (phase !== "idle" || disabled || isPending) return;
 
-    setPhase("archiving");
-    await new Promise((r) => setTimeout(r, 1000));
-
-    setPhase("syncing");
-    await new Promise((r) => setTimeout(r, 800));
-
-    setPhase("complete");
-    await onArchive();
-  }, [phase, disabled, onArchive]);
+    setIsPending(true);
+    try {
+      await onArchive();
+    } catch {
+      setIsPending(false);
+    } finally {
+      // If successful, archiving will become true and trigger the useEffect.
+      // If failed, archiving remains false, so isPending becomes false.
+    }
+  }, [phase, disabled, isPending, onArchive]);
 
   const getButtonContent = () => {
+    if (isPending) {
+      return (
+        <span className="flex items-center gap-2">
+          <span className="archive-spinner" />
+          ARCHIVE ENTRY
+        </span>
+      );
+    }
     switch (phase) {
       case "archiving":
         return (
@@ -59,7 +98,7 @@ export default function ArchiveButton({
         return (
           <span className="flex items-center gap-2">
             <span className="text-bg">✓</span>
-            ENTRY ARCHIVED
+            COMPLETE
           </span>
         );
       default:
@@ -67,7 +106,7 @@ export default function ArchiveButton({
     }
   };
 
-  const isProcessing = phase !== "idle" && phase !== "complete";
+  const isProcessing = (phase !== "idle" && phase !== "complete") || isPending || archiving;
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -84,7 +123,7 @@ export default function ArchiveButton({
           flex items-center justify-center gap-2
           ${phase === "complete"
             ? "bg-lime text-bg border-lime"
-            : phase === "idle"
+            : (phase === "idle" && !isPending)
               ? disabled
                 ? "bg-surface text-text-muted border-border cursor-not-allowed"
                 : "bg-lime text-bg border-lime hover:bg-transparent hover:text-lime glow-lime-box"
@@ -96,7 +135,7 @@ export default function ArchiveButton({
       </button>
 
       {/* Secondary Actions */}
-      {phase === "idle" && (
+      {phase === "idle" && !isPending && (
         <>
           <button
             onClick={onSaveDraft}

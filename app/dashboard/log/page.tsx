@@ -125,6 +125,8 @@ function LogContent() {
   const [spoiler, setSpoiler] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [visibility, setVisibility] = useState<LogEntryVisibility>("PUBLIC");
+  const [archiving, setArchiving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // ── Handlers ──
   const handleChangeGame = useCallback(() => {
@@ -133,21 +135,35 @@ function LogContent() {
 
   const handleArchive = useCallback(async () => {
     if (!game) return;
+    setError(null);
 
-    await apiPost<LogGameResponse>("/api/games/log", {
-      igdbId: game.igdbId,
-      rating: rating > 0 ? rating : null,
-      playedAt: playedAt.toISOString(),
-      status,
-      replay: status === "REPLAYED",
-      review: review.trim() || undefined,
-      visibility,
-      spoiler,
-      tags,
-    });
+    try {
+      await apiPost<LogGameResponse>("/api/games/log", {
+        igdbId: game.igdbId,
+        rating: rating > 0 ? rating : null,
+        playedAt: playedAt.toISOString(),
+        status,
+        replay: status === "REPLAYED",
+        review: review.trim() || undefined,
+        visibility,
+        spoiler,
+        tags,
+      });
 
-    // Redirect to dashboard after successful archive
-    router.push("/dashboard");
+      // On success
+      setArchiving(true);
+
+      // Wait approximately 1200ms
+      await new Promise((r) => setTimeout(r, 1200));
+
+      // Redirect to dashboard after successful archive
+      router.push("/dashboard");
+    } catch (err) {
+      setArchiving(false);
+      const errMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(errMsg);
+      throw err;
+    }
   }, [game, rating, playedAt, status, review, spoiler, tags, visibility, router]);
 
   const handleSaveDraft = useCallback(() => {
@@ -271,10 +287,21 @@ function LogContent() {
             </div>
 
             <div className="log-section-animate" style={{ animationDelay: "0.4s" }}>
+              {error && (
+                <div className="mb-4 border border-warning/30 bg-surface p-4 text-left font-mono">
+                  <span className="font-pixel text-[9px] text-warning tracking-wider block mb-1">
+                    ARCHIVE_FAILED_
+                  </span>
+                  <span className="text-[10px] text-text-muted">
+                    {error}
+                  </span>
+                </div>
+              )}
               <ArchiveButton
                 onArchive={handleArchive}
                 onSaveDraft={handleSaveDraft}
                 onCancel={handleCancel}
+                archiving={archiving}
               />
             </div>
           </aside>
@@ -286,7 +313,7 @@ function LogContent() {
             [ SYSTEM READY ] &gt; LOG_COMPOSER_V1
           </span>
           <span className="font-mono text-[9px] text-text-muted/30 tracking-wider">
-            // IGDB_CONNECTED
+            {"// IGDB_CONNECTED"}
           </span>
         </div>
       </main>

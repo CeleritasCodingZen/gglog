@@ -247,6 +247,17 @@ exports.Prisma.ActivityScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  actorId: 'actorId',
+  type: 'type',
+  reviewId: 'reviewId',
+  commentId: 'commentId',
+  read: 'read',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -299,6 +310,12 @@ exports.ActivityType = exports.$Enums.ActivityType = {
   FOLLOWED_USER: 'FOLLOWED_USER'
 };
 
+exports.NotificationType = exports.$Enums.NotificationType = {
+  NEW_FOLLOWER: 'NEW_FOLLOWER',
+  REVIEW_LIKED: 'REVIEW_LIKED',
+  REVIEW_COMMENTED: 'REVIEW_COMMENTED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Profile: 'Profile',
@@ -314,6 +331,7 @@ exports.Prisma.ModelName = {
   ReviewLike: 'ReviewLike',
   Comment: 'Comment',
   Activity: 'Activity',
+  Notification: 'Notification',
   Account: 'Account',
   Session: 'Session'
 };
