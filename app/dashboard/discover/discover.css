@@ -1,0 +1,145 @@
+/* ============================================
+   GGLOG DISCOVER — Archive Styles
+   ============================================ */
+
+/* ---- Grid / scanline header background ---- */
+
+.discover-header-bg {
+  position: relative;
+}
+
+.discover-header-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image:
+    linear-gradient(rgba(204, 255, 0, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204, 255, 0, 0.4) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ---- Staggered Fade-in ---- */
+
+@keyframes discoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.discover-fade-1 { opacity: 0; animation: discoverFadeIn 0.5s ease 0.05s forwards; }
+.discover-fade-2 { opacity: 0; animation: discoverFadeIn 0.5s ease 0.18s forwards; }
+.discover-fade-3 { opacity: 0; animation: discoverFadeIn 0.5s ease 0.3s forwards; }
+.discover-fade-4 { opacity: 0; animation: discoverFadeIn 0.5s ease 0.42s forwards; }
+.discover-fade-5 { opacity: 0; animation: discoverFadeIn 0.5s ease 0.54s forwards; }
+
+/* ---- Player Card stagger ---- */
+
+@keyframes playerCardSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.player-card-animate {
+  opacity: 0;
+  animation: playerCardSlide 0.4s ease forwards;
+}
+
+/* ---- Review Card stagger ---- */
+
+@keyframes reviewCardFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.review-card-animate {
+  opacity: 0;
+  animation: reviewCardFade 0.4s ease forwards;
+}
+
+/* ---- Sidebar panel hover lines ---- */
+
+.sidebar-panel {
+  position: relative;
+}
+
+.sidebar-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(204, 255, 0, 0.15);
+  pointer-events: none;
+}
+
+/* ---- Responsive layout ---- */
+
+/* Desktop: asymmetric two-column */
+.discover-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .discover-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 32px;
+  }
+
+  .discover-main-col {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  .discover-side-col {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+  }
+}
+
+/* Tablet: stack with smaller side column inline */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .discover-layout {
+    flex-direction: column;
+  }
+
+  .discover-side-col {
+    width: 100%;
+  }
+}
+
+/* Mobile: full-width single column */
+@media (max-width: 767px) {
+  .discover-layout {
+    flex-direction: column;
+  }
+
+  .discover-side-col {
+    order: 99; /* Push sidebar below all main content */
+    width: 100%;
+  }
+}

@@ -364,3 +364,60 @@ export async function deleteReview(reviewId: string, userId: string): Promise<vo
 
   await prisma.review.delete({ where: { id: reviewId } })
 }
+
+// ---- Discover feed ----
+
+/**
+ * Get paginated public reviews for the community Discover page.
+ *
+ * Returns only PUBLIC reviews ordered by recency.
+ * No social graph required — any authenticated user can view.
+ *
+ * @param viewerId  - the authenticated viewer (for hasLiked status)
+ * @param gameId    - optional filter by game ID
+ * @param limit     - items per page
+ * @param cursor    - pagination cursor
+ */
+export async function getDiscoverReviews(
+  viewerId: string,
+  limit: number,
+  cursor: { id: string; createdAt: string } | null,
+  gameId?: string
+): Promise<PaginatedResult<ReviewResponse>> {
+  const rows = await prisma.review.findMany({
+    where: {
+      visibility: 'PUBLIC',
+      ...(gameId ? { gameId } : {}),
+      ...(cursor
+        ? {
+            OR: [
+              { createdAt: { lt: new Date(cursor.createdAt) } },
+              { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } },
+            ],
+          }
+        : {}),
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: limit + 1,
+    select: reviewSelect,
+  })
+
+  const typedRows = rows as unknown as ReviewRow[]
+  const result = buildPaginatedResult(typedRows, limit)
+
+  let likedSet = new Set<string>()
+  if (result.items.length > 0) {
+    const ids = result.items.map((r) => r.id)
+    const likes = await prisma.reviewLike.findMany({
+      where: { userId: viewerId, reviewId: { in: ids } },
+      select: { reviewId: true },
+    })
+    likedSet = new Set(likes.map((l) => l.reviewId))
+  }
+
+  return {
+    items: result.items.map((r) => serializeReview(r, likedSet.has(r.id))),
+    nextCursor: result.nextCursor,
+    hasMore: result.hasMore,
+  }
+}

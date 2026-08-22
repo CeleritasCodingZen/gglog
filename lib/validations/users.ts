@@ -21,3 +21,17 @@ export const usernameParamSchema = z.object({
 })
 
 export type UsernameParam = z.infer<typeof usernameParamSchema>
+
+/**
+ * Validates the `q` search query for user search.
+ * Empty/whitespace query is allowed and returns default discoverable users.
+ */
+export const userSearchSchema = z.object({
+  q: z
+    .string()
+    .trim()
+    .max(50, 'Search query must be at most 50 characters.')
+    .default(''),
+})
+
+export type UserSearchInput = z.infer<typeof userSearchSchema>

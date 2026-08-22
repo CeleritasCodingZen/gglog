@@ -11,8 +11,9 @@
 
 import { prisma } from '@/lib/db'
 import { Errors } from '@/lib/errors'
-import { getFollowRelationship, getFollowerCount, getFollowingCount } from '@/lib/services/followService'
+import { getFollowRelationship, getFollowerCount, getFollowingCount, isFollowing } from '@/lib/services/followService'
 import type { PublicUser, UserProfile, UserStats } from '@/lib/types/user'
+import { buildPaginatedResult, type PaginatedResult } from '@/lib/pagination/cursor'
 
 /**
  * Find a user by username.
@@ -100,3 +101,94 @@ export async function getUserProfile(
  * Convenience re-export for routes that need it separately.
  */
 export { getFollowRelationship as getUserRelationship }
+
+// ---- Search ----
+
+export interface SearchUserResult extends PublicUser {
+  followerCount: number
+  followingCount: number
+  gameCount: number
+  reviewCount: number
+  isFollowing: boolean
+}
+
+/**
+ * Search users by username or display name (case-insensitive).
+ *
+ * @param query     - search string
+ * @param viewerId  - the authenticated viewer (for isFollowing status)
+ * @param limit     - page size
+ * @param cursor    - opaque pagination cursor
+ */
+export async function searchUsers(
+  query: string,
+  viewerId: string,
+  limit: number,
+  cursor: { id: string; createdAt: string } | null
+): Promise<PaginatedResult<SearchUserResult>> {
+  const trimmed = query.trim()
+
+  const rows = await prisma.user.findMany({
+    where: {
+      ...(trimmed
+        ? {
+            OR: [
+              { username: { contains: trimmed, mode: 'insensitive' as const } },
+              { profile: { displayName: { contains: trimmed, mode: 'insensitive' as const } } },
+            ],
+          }
+        : {}),
+      // Exclude the viewer from their own results
+      NOT: { id: viewerId },
+      ...(cursor
+        ? {
+            OR: [
+              { createdAt: { lt: new Date(cursor.createdAt) } },
+              { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } },
+            ],
+          }
+        : {}),
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: limit + 1,
+    select: {
+      id: true,
+      username: true,
+      createdAt: true,
+      profile: { select: { displayName: true, avatarUrl: true, bio: true } },
+      _count: { select: { followers: true, following: true, logEntries: true, reviews: true } },
+    },
+  })
+
+  const result = buildPaginatedResult(
+    rows as Array<(typeof rows)[number] & { createdAt: Date }>,
+    limit
+  )
+
+  // Batch check which users the viewer follows
+  const ids = result.items.map((r) => r.id)
+  const follows = ids.length > 0
+    ? await prisma.follow.findMany({
+        where: { followerId: viewerId, followingId: { in: ids } },
+        select: { followingId: true },
+      })
+    : []
+  const followingSet = new Set(follows.map((f) => f.followingId))
+
+  return {
+    items: result.items.map((r) => ({
+      id: r.id,
+      username: r.username,
+      displayName: r.profile?.displayName ?? null,
+      avatarUrl: r.profile?.avatarUrl ?? null,
+      bio: r.profile?.bio ?? null,
+      followerCount: r._count.followers,
+      followingCount: r._count.following,
+      gameCount: r._count.logEntries,
+      reviewCount: r._count.reviews,
+      isFollowing: followingSet.has(r.id),
+    })),
+    nextCursor: result.nextCursor,
+    hasMore: result.hasMore,
+  }
+}
