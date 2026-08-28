@@ -12,11 +12,12 @@ import Link from "next/link";
 import GlitchText from "@/components/ui/GlitchText";
 import { useAuth } from "@/components/providers/AuthContext";
 import GameSearchModal from "@/components/search/GameSearchModal";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const NAV_LINKS = [
   { label: "GAMES", href: "#games" },
   { label: "COMMUNITY", href: "#community" },
-  { label: "DISCOVER", href: "#discover" },
+  { label: "DISCOVER", href: "/dashboard/discover" },
   { label: "PROFILE", href: "/dashboard", active: true },
 ];
 
@@ -104,6 +105,9 @@ export default function ProfileNavbar() {
                 <path d="m21 21-4.3-4.3" />
               </svg>
             </button>
+
+            {/* Notifications */}
+            <NotificationBell />
 
             {/* Avatar */}
             <div className="w-7 h-7 bg-surface border border-border flex items-center justify-center">

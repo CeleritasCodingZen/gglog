@@ -7,7 +7,7 @@
 
 "use client";
 
-export type SearchTab = "PEOPLE" | "REVIEWS" | "GAMES";
+export type SearchTab = "PEOPLE" | "REVIEWS" | "FOLLOWING";
 
 interface DiscoverSearchProps {
   query: string;
@@ -16,7 +16,7 @@ interface DiscoverSearchProps {
   onTabChange: (tab: SearchTab) => void;
 }
 
-const TABS: SearchTab[] = ["PEOPLE", "REVIEWS", "GAMES"];
+const TABS: SearchTab[] = ["PEOPLE", "REVIEWS", "FOLLOWING"];
 
 export default function DiscoverSearch({
   query,

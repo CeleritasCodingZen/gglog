@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, VT323, JetBrains_Mono, Space_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/providers/AuthContext";
+import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import "./globals.css";
 
 const pressStart = Press_Start_2P({
@@ -55,7 +56,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="noise-overlay" aria-hidden="true" />
         {/* Main Content */}
         <AuthProvider>
-          {children}
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

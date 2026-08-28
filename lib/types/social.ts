@@ -25,19 +25,39 @@ export interface PaginatedResponse<T> {
 }
 
 /**
+ * Notification actor as returned by the API.
+ */
+export interface NotificationActorResponse {
+  id: string
+  username: string
+  displayName: string | null
+  avatarUrl: string | null
+}
+
+/**
  * Notification as returned by the API.
+ *
+ * Type names are mapped from Prisma enums to frontend-friendly names:
+ *   NEW_FOLLOWER     → FOLLOW
+ *   REVIEW_LIKED     → REVIEW_LIKE
+ *   REVIEW_COMMENTED → REVIEW_COMMENT
  */
 export interface NotificationResponse {
   id: string
-  type: 'NEW_FOLLOWER' | 'REVIEW_LIKED' | 'REVIEW_COMMENTED'
-  read: boolean
-  createdAt: string
-  actor: {
+  type: 'FOLLOW' | 'REVIEW_LIKE' | 'REVIEW_COMMENT'
+  actor: NotificationActorResponse
+  review: {
     id: string
-    username: string
-    displayName: string | null
-    avatarUrl: string | null
-  }
-  reviewId: string | null
-  commentId: string | null
+    game: {
+      id: string
+      name: string
+      coverUrl: string | null
+    } | null
+  } | null
+  comment: {
+    id: string
+    body: string
+  } | null
+  isRead: boolean
+  createdAt: string
 }

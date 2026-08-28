@@ -17,6 +17,9 @@ interface PlayerGridProps {
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export default function PlayerGrid({
@@ -26,6 +29,9 @@ export default function PlayerGrid({
   isLoading,
   error,
   onRetry,
+  hasMore,
+  loadingMore,
+  onLoadMore,
 }: PlayerGridProps) {
   return (
     <section>
@@ -61,16 +67,39 @@ export default function PlayerGrid({
       ) : users.length === 0 ? (
         <NoResults query={searchQuery} type="PLAYERS" />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {users.map((user, index) => (
-            <PlayerCard
-              key={user.id}
-              user={user}
-              currentUserId={currentUserId}
-              index={index}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {users.map((user, index) => (
+              <PlayerCard
+                key={user.id}
+                user={user}
+                currentUserId={currentUserId}
+                index={index}
+              />
+            ))}
+          </div>
+
+          {/* Load More */}
+          {hasMore && onLoadMore && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={onLoadMore}
+                disabled={loadingMore}
+                className="
+                  font-[family-name:var(--font-press-start)] text-[8px] tracking-wider
+                  border border-border text-text-muted
+                  px-6 py-2.5
+                  hover:border-lime/40 hover:text-lime
+                  transition-all duration-200
+                  btn-press
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                "
+              >
+                {loadingMore ? "LOADING..." : "[ LOAD MORE PLAYERS ]"}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

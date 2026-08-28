@@ -14,6 +14,9 @@ import type { FeedItem } from "@/lib/types/feed";
 interface FollowingFeedProps {
   items: FeedItem[];
   isLoading?: boolean;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 function timeAgo(isoString: string): string {
@@ -100,7 +103,7 @@ function FeedEntry({ item }: { item: FeedItem }) {
   );
 }
 
-export default function FollowingFeed({ items, isLoading }: FollowingFeedProps) {
+export default function FollowingFeed({ items, isLoading, hasMore, loadingMore, onLoadMore }: FollowingFeedProps) {
   return (
     <section>
       {/* Section heading */}
@@ -123,11 +126,34 @@ export default function FollowingFeed({ items, isLoading }: FollowingFeedProps) 
           </p>
         </div>
       ) : (
-        <div className="border border-border bg-surface px-4">
-          {items.map((item) => (
-            <FeedEntry key={item.id} item={item} />
-          ))}
-        </div>
+        <>
+          <div className="border border-border bg-surface px-4">
+            {items.map((item) => (
+              <FeedEntry key={item.id} item={item} />
+            ))}
+          </div>
+
+          {/* Load More */}
+          {hasMore && onLoadMore && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={onLoadMore}
+                disabled={loadingMore}
+                className="
+                  font-[family-name:var(--font-press-start)] text-[8px] tracking-wider
+                  border border-border text-text-muted
+                  px-6 py-2.5
+                  hover:border-lime/40 hover:text-lime
+                  transition-all duration-200
+                  btn-press
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                "
+              >
+                {loadingMore ? "LOADING..." : "[ LOAD MORE ACTIVITY ]"}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

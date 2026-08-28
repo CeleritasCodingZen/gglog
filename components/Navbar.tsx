@@ -5,10 +5,10 @@ import Link from "next/link";
 import GlitchText from "./ui/GlitchText";
 import { useAuth } from "@/components/providers/AuthContext";
 
-const NAV_LINKS = [
+const BASE_NAV_LINKS = [
   { label: "GAMES", href: "#games" },
   { label: "COMMUNITY", href: "#community" },
-  { label: "DISCOVER", href: "#discover" },
+  { label: "DISCOVER", href: "#discover", authHref: "/dashboard/discover" },
   { label: "PROFILE", href: "/dashboard" },
 ];
 
@@ -54,26 +54,29 @@ export default function Navbar() {
 
         {/* Center — Links (desktop) */}
         <div className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link, i) => (
-            <div key={link.label} className="flex items-center">
-              <a
-                href={link.href}
-                className="
-                  font-[family-name:var(--font-press-start)] text-[9px] tracking-wider
-                  text-text-dim hover:text-lime
-                  px-3 py-2
-                  transition-colors duration-200
-                  relative group
-                "
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-px bg-lime group-hover:w-full transition-all duration-300" />
-              </a>
-              {i < NAV_LINKS.length - 1 && (
-                <span className="text-text-muted text-[10px] font-[family-name:var(--font-jetbrains)] select-none">//</span>
-              )}
-            </div>
-          ))}
+          {BASE_NAV_LINKS.map((link, i) => {
+            const resolvedHref = user && link.authHref ? link.authHref : link.href;
+            return (
+              <div key={link.label} className="flex items-center">
+                <a
+                  href={resolvedHref}
+                  className="
+                    font-[family-name:var(--font-press-start)] text-[9px] tracking-wider
+                    text-text-dim hover:text-lime
+                    px-3 py-2
+                    transition-colors duration-200
+                    relative group
+                  "
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-px bg-lime group-hover:w-full transition-all duration-300" />
+                </a>
+                {i < BASE_NAV_LINKS.length - 1 && (
+                  <span className="text-text-muted text-[10px] font-[family-name:var(--font-jetbrains)] select-none">{"//"}</span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Right — Actions (desktop) */}
@@ -159,21 +162,24 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="md:hidden bg-bg/98 border-t border-border">
           <div className="px-4 py-4 space-y-1">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="
-                  block font-[family-name:var(--font-press-start)] text-[10px]
-                  text-text-dim hover:text-lime
-                  py-3 px-2 border-b border-border/50
-                  transition-colors
-                "
-              >
-                // {link.label}
-              </a>
-            ))}
+            {BASE_NAV_LINKS.map((link) => {
+              const resolvedHref = user && link.authHref ? link.authHref : link.href;
+              return (
+                <a
+                  key={link.label}
+                  href={resolvedHref}
+                  onClick={() => setMobileOpen(false)}
+                  className="
+                    block font-[family-name:var(--font-press-start)] text-[10px]
+                    text-text-dim hover:text-lime
+                    py-3 px-2 border-b border-border/50
+                    transition-colors
+                  "
+                >
+                  {"// "}{link.label}
+                </a>
+              );
+            })}
             <div className="flex gap-3 pt-4">
               {loading ? null : user ? (
                 <>

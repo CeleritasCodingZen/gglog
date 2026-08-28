@@ -1,12 +1,9 @@
-// ============================================
-// GGLOG — Cursor Pagination Utilities
-// ============================================
+
 // Cursor-based pagination for social feeds,
 // comments, reviews, followers, activity, etc.
-//
 // Cursors are opaque base64-encoded strings
 // wrapping a stable sort key (createdAt ISO + id).
-// ============================================
+
 
 export interface CursorPayload {
   id: string
@@ -19,9 +16,7 @@ export interface PaginatedResult<T> {
   hasMore: boolean
 }
 
-/**
- * Encode a cursor payload to an opaque base64 string.
- */
+
 export function encodeCursor(payload: CursorPayload): string {
   return Buffer.from(JSON.stringify(payload)).toString('base64url')
 }

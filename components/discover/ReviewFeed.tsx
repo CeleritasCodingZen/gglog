@@ -16,6 +16,9 @@ interface ReviewFeedProps {
   searchQuery?: string;
   isLoading?: boolean;
   sectionTitle?: string;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export default function ReviewFeed({
@@ -25,6 +28,9 @@ export default function ReviewFeed({
   searchQuery,
   isLoading,
   sectionTitle = "RECENTLY ARCHIVED REVIEWS_",
+  hasMore,
+  loadingMore,
+  onLoadMore,
 }: ReviewFeedProps) {
   return (
     <section>
@@ -46,17 +52,40 @@ export default function ReviewFeed({
       ) : reviews.length === 0 ? (
         <NoResults query={searchQuery} />
       ) : (
-        <div className="space-y-3">
-          {reviews.map((review, index) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              currentUserId={currentUserId}
-              currentUsername={currentUsername}
-              index={index}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {reviews.map((review, index) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                currentUserId={currentUserId}
+                currentUsername={currentUsername}
+                index={index}
+              />
+            ))}
+          </div>
+
+          {/* Load More */}
+          {hasMore && onLoadMore && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={onLoadMore}
+                disabled={loadingMore}
+                className="
+                  font-[family-name:var(--font-press-start)] text-[8px] tracking-wider
+                  border border-border text-text-muted
+                  px-6 py-2.5
+                  hover:border-lime/40 hover:text-lime
+                  transition-all duration-200
+                  btn-press
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                "
+              >
+                {loadingMore ? "LOADING..." : "[ LOAD MORE REVIEWS ]"}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

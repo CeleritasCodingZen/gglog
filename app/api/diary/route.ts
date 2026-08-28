@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
           }
         : null,
     }))
-
     return apiSuccess({
       entries: serialized,
       pagination: {

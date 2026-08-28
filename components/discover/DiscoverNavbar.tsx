@@ -12,6 +12,7 @@ import Link from "next/link";
 import GlitchText from "@/components/ui/GlitchText";
 import { useAuth } from "@/components/providers/AuthContext";
 import GameSearchModal from "@/components/search/GameSearchModal";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const NAV_LINKS: Array<{ label: string; href: string; active?: true }> = [
   { label: "GAMES", href: "#games" },
@@ -113,6 +114,9 @@ export default function DiscoverNavbar() {
                 <path d="m21 21-4.3-4.3" />
               </svg>
             </button>
+
+            {/* Notifications */}
+            <NotificationBell />
 
             {/* Avatar */}
             <div className="w-7 h-7 bg-surface border border-border flex items-center justify-center">
