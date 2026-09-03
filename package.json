@@ -2,15 +2,15 @@
   "name": "gglog",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "dev": "next dev",
-  "dev:ws": "tsx --watch server/ws.ts",
-  "dev:all": "concurrently --names next,ws --prefix-colors blue,green \"npm run dev\" \"npm run dev:ws\"",
-  "build": "next build",
-  "start": "next start",
-  "ws": "tsx server/ws.ts",
-  "lint": "eslint"
-},
+  "scripts": {
+    "dev": "next dev",
+    "dev:ws": "tsx --watch server/ws.ts",
+    "dev:all": "concurrently --names next,ws --prefix-colors blue,green \"npm run dev\" \"npm run dev:ws\"",
+    "build": "next build",
+    "start": "next start",
+    "ws": "tsx server/ws.ts",
+    "lint": "eslint"
+  },
   "dependencies": {
     "@prisma/adapter-neon": "^7.9.1",
     "@prisma/client": "^7.9.1",
@@ -36,7 +36,7 @@
     "eslint-config-next": "16.3.0",
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
-    "tsx": "^4.23.12",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }
