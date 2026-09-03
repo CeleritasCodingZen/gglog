@@ -275,6 +275,15 @@ exports.Prisma.SessionScalarFieldEnum = {
   expiresAt: 'expiresAt'
 };
 
+exports.Prisma.WsTicketScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  used: 'used',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -333,7 +342,8 @@ exports.Prisma.ModelName = {
   Activity: 'Activity',
   Notification: 'Notification',
   Account: 'Account',
-  Session: 'Session'
+  Session: 'Session',
+  WsTicket: 'WsTicket'
 };
 
 /**

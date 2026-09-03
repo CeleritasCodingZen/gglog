@@ -8,7 +8,7 @@
   "dev:all": "concurrently --names next,ws --prefix-colors blue,green \"npm run dev\" \"npm run dev:ws\"",
   "build": "next build",
   "start": "next start",
-  "start:ws": "tsx server/ws.ts",
+  "ws": "tsx server/ws.ts",
   "lint": "eslint"
 },
   "dependencies": {

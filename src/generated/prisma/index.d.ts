@@ -98,6 +98,11 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  * 
  */
 export type Session = $Result.DefaultSelection<Prisma.$SessionPayload>
+/**
+ * Model WsTicket
+ * 
+ */
+export type WsTicket = $Result.DefaultSelection<Prisma.$WsTicketPayload>
 
 /**
  * Enums
@@ -449,6 +454,16 @@ export class PrismaClient<
     * ```
     */
   get session(): Prisma.SessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.wsTicket`: Exposes CRUD operations for the **WsTicket** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WsTickets
+    * const wsTickets = await prisma.wsTicket.findMany()
+    * ```
+    */
+  get wsTicket(): Prisma.WsTicketDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -912,7 +927,8 @@ export namespace Prisma {
     Activity: 'Activity',
     Notification: 'Notification',
     Account: 'Account',
-    Session: 'Session'
+    Session: 'Session',
+    WsTicket: 'WsTicket'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -928,7 +944,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "profile" | "game" | "genre" | "platform" | "logEntry" | "review" | "watchlistItem" | "list" | "listItem" | "follow" | "reviewLike" | "comment" | "activity" | "notification" | "account" | "session"
+      modelProps: "user" | "profile" | "game" | "genre" | "platform" | "logEntry" | "review" | "watchlistItem" | "list" | "listItem" | "follow" | "reviewLike" | "comment" | "activity" | "notification" | "account" | "session" | "wsTicket"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2190,6 +2206,80 @@ export namespace Prisma {
           }
         }
       }
+      WsTicket: {
+        payload: Prisma.$WsTicketPayload<ExtArgs>
+        fields: Prisma.WsTicketFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WsTicketFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WsTicketFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          findFirst: {
+            args: Prisma.WsTicketFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WsTicketFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          findMany: {
+            args: Prisma.WsTicketFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>[]
+          }
+          create: {
+            args: Prisma.WsTicketCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          createMany: {
+            args: Prisma.WsTicketCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.WsTicketCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>[]
+          }
+          delete: {
+            args: Prisma.WsTicketDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          update: {
+            args: Prisma.WsTicketUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          deleteMany: {
+            args: Prisma.WsTicketDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WsTicketUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.WsTicketUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>[]
+          }
+          upsert: {
+            args: Prisma.WsTicketUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WsTicketPayload>
+          }
+          aggregate: {
+            args: Prisma.WsTicketAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWsTicket>
+          }
+          groupBy: {
+            args: Prisma.WsTicketGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WsTicketGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WsTicketCountArgs<ExtArgs>
+            result: $Utils.Optional<WsTicketCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2330,6 +2420,7 @@ export namespace Prisma {
     notification?: NotificationOmit
     account?: AccountOmit
     session?: SessionOmit
+    wsTicket?: WsTicketOmit
   }
 
   /* Types for Logging */
@@ -2423,6 +2514,7 @@ export namespace Prisma {
     following: number
     notifications: number
     sentNotifications: number
+    wsTickets: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2439,6 +2531,7 @@ export namespace Prisma {
     following?: boolean | UserCountOutputTypeCountFollowingArgs
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     sentNotifications?: boolean | UserCountOutputTypeCountSentNotificationsArgs
+    wsTickets?: boolean | UserCountOutputTypeCountWsTicketsArgs
   }
 
   // Custom InputTypes
@@ -2541,6 +2634,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSentNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountWsTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WsTicketWhereInput
   }
 
 
@@ -3041,6 +3141,7 @@ export namespace Prisma {
     following?: boolean | User$followingArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
+    wsTickets?: boolean | User$wsTicketsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3087,6 +3188,7 @@ export namespace Prisma {
     following?: boolean | User$followingArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
+    wsTickets?: boolean | User$wsTicketsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3109,6 +3211,7 @@ export namespace Prisma {
       following: Prisma.$FollowPayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       sentNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+      wsTickets: Prisma.$WsTicketPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3525,6 +3628,7 @@ export namespace Prisma {
     following<T extends User$followingArgs<ExtArgs> = {}>(args?: Subset<T, User$followingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentNotifications<T extends User$sentNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    wsTickets<T extends User$wsTicketsArgs<ExtArgs> = {}>(args?: Subset<T, User$wsTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4281,6 +4385,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * User.wsTickets
+   */
+  export type User$wsTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    where?: WsTicketWhereInput
+    orderBy?: WsTicketOrderByWithRelationInput | WsTicketOrderByWithRelationInput[]
+    cursor?: WsTicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: WsTicketScalarFieldEnum | WsTicketScalarFieldEnum[]
   }
 
   /**
@@ -22446,6 +22574,1082 @@ export namespace Prisma {
 
 
   /**
+   * Model WsTicket
+   */
+
+  export type AggregateWsTicket = {
+    _count: WsTicketCountAggregateOutputType | null
+    _min: WsTicketMinAggregateOutputType | null
+    _max: WsTicketMaxAggregateOutputType | null
+  }
+
+  export type WsTicketMinAggregateOutputType = {
+    id: string | null
+    token: string | null
+    userId: string | null
+    expiresAt: Date | null
+    used: boolean | null
+    createdAt: Date | null
+  }
+
+  export type WsTicketMaxAggregateOutputType = {
+    id: string | null
+    token: string | null
+    userId: string | null
+    expiresAt: Date | null
+    used: boolean | null
+    createdAt: Date | null
+  }
+
+  export type WsTicketCountAggregateOutputType = {
+    id: number
+    token: number
+    userId: number
+    expiresAt: number
+    used: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type WsTicketMinAggregateInputType = {
+    id?: true
+    token?: true
+    userId?: true
+    expiresAt?: true
+    used?: true
+    createdAt?: true
+  }
+
+  export type WsTicketMaxAggregateInputType = {
+    id?: true
+    token?: true
+    userId?: true
+    expiresAt?: true
+    used?: true
+    createdAt?: true
+  }
+
+  export type WsTicketCountAggregateInputType = {
+    id?: true
+    token?: true
+    userId?: true
+    expiresAt?: true
+    used?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type WsTicketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WsTicket to aggregate.
+     */
+    where?: WsTicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WsTickets to fetch.
+     */
+    orderBy?: WsTicketOrderByWithRelationInput | WsTicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WsTicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WsTickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WsTickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WsTickets
+    **/
+    _count?: true | WsTicketCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WsTicketMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WsTicketMaxAggregateInputType
+  }
+
+  export type GetWsTicketAggregateType<T extends WsTicketAggregateArgs> = {
+        [P in keyof T & keyof AggregateWsTicket]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWsTicket[P]>
+      : GetScalarType<T[P], AggregateWsTicket[P]>
+  }
+
+
+
+
+  export type WsTicketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WsTicketWhereInput
+    orderBy?: WsTicketOrderByWithAggregationInput | WsTicketOrderByWithAggregationInput[]
+    by: WsTicketScalarFieldEnum[] | WsTicketScalarFieldEnum
+    having?: WsTicketScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WsTicketCountAggregateInputType | true
+    _min?: WsTicketMinAggregateInputType
+    _max?: WsTicketMaxAggregateInputType
+  }
+
+  export type WsTicketGroupByOutputType = {
+    id: string
+    token: string
+    userId: string
+    expiresAt: Date
+    used: boolean
+    createdAt: Date
+    _count: WsTicketCountAggregateOutputType | null
+    _min: WsTicketMinAggregateOutputType | null
+    _max: WsTicketMaxAggregateOutputType | null
+  }
+
+  type GetWsTicketGroupByPayload<T extends WsTicketGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WsTicketGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WsTicketGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WsTicketGroupByOutputType[P]>
+            : GetScalarType<T[P], WsTicketGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WsTicketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    userId?: boolean
+    expiresAt?: boolean
+    used?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wsTicket"]>
+
+  export type WsTicketSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    userId?: boolean
+    expiresAt?: boolean
+    used?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wsTicket"]>
+
+  export type WsTicketSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    userId?: boolean
+    expiresAt?: boolean
+    used?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wsTicket"]>
+
+  export type WsTicketSelectScalar = {
+    id?: boolean
+    token?: boolean
+    userId?: boolean
+    expiresAt?: boolean
+    used?: boolean
+    createdAt?: boolean
+  }
+
+  export type WsTicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "token" | "userId" | "expiresAt" | "used" | "createdAt", ExtArgs["result"]["wsTicket"]>
+  export type WsTicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type WsTicketIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type WsTicketIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $WsTicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WsTicket"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      token: string
+      userId: string
+      expiresAt: Date
+      used: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["wsTicket"]>
+    composites: {}
+  }
+
+  type WsTicketGetPayload<S extends boolean | null | undefined | WsTicketDefaultArgs> = $Result.GetResult<Prisma.$WsTicketPayload, S>
+
+  type WsTicketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WsTicketFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WsTicketCountAggregateInputType | true
+    }
+
+  export interface WsTicketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WsTicket'], meta: { name: 'WsTicket' } }
+    /**
+     * Find zero or one WsTicket that matches the filter.
+     * @param {WsTicketFindUniqueArgs} args - Arguments to find a WsTicket
+     * @example
+     * // Get one WsTicket
+     * const wsTicket = await prisma.wsTicket.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WsTicketFindUniqueArgs>(args: SelectSubset<T, WsTicketFindUniqueArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WsTicket that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WsTicketFindUniqueOrThrowArgs} args - Arguments to find a WsTicket
+     * @example
+     * // Get one WsTicket
+     * const wsTicket = await prisma.wsTicket.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WsTicketFindUniqueOrThrowArgs>(args: SelectSubset<T, WsTicketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WsTicket that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketFindFirstArgs} args - Arguments to find a WsTicket
+     * @example
+     * // Get one WsTicket
+     * const wsTicket = await prisma.wsTicket.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WsTicketFindFirstArgs>(args?: SelectSubset<T, WsTicketFindFirstArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WsTicket that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketFindFirstOrThrowArgs} args - Arguments to find a WsTicket
+     * @example
+     * // Get one WsTicket
+     * const wsTicket = await prisma.wsTicket.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WsTicketFindFirstOrThrowArgs>(args?: SelectSubset<T, WsTicketFindFirstOrThrowArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WsTickets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WsTickets
+     * const wsTickets = await prisma.wsTicket.findMany()
+     * 
+     * // Get first 10 WsTickets
+     * const wsTickets = await prisma.wsTicket.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const wsTicketWithIdOnly = await prisma.wsTicket.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WsTicketFindManyArgs>(args?: SelectSubset<T, WsTicketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WsTicket.
+     * @param {WsTicketCreateArgs} args - Arguments to create a WsTicket.
+     * @example
+     * // Create one WsTicket
+     * const WsTicket = await prisma.wsTicket.create({
+     *   data: {
+     *     // ... data to create a WsTicket
+     *   }
+     * })
+     * 
+     */
+    create<T extends WsTicketCreateArgs>(args: SelectSubset<T, WsTicketCreateArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WsTickets.
+     * @param {WsTicketCreateManyArgs} args - Arguments to create many WsTickets.
+     * @example
+     * // Create many WsTickets
+     * const wsTicket = await prisma.wsTicket.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WsTicketCreateManyArgs>(args?: SelectSubset<T, WsTicketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many WsTickets and returns the data saved in the database.
+     * @param {WsTicketCreateManyAndReturnArgs} args - Arguments to create many WsTickets.
+     * @example
+     * // Create many WsTickets
+     * const wsTicket = await prisma.wsTicket.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many WsTickets and only return the `id`
+     * const wsTicketWithIdOnly = await prisma.wsTicket.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends WsTicketCreateManyAndReturnArgs>(args?: SelectSubset<T, WsTicketCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a WsTicket.
+     * @param {WsTicketDeleteArgs} args - Arguments to delete one WsTicket.
+     * @example
+     * // Delete one WsTicket
+     * const WsTicket = await prisma.wsTicket.delete({
+     *   where: {
+     *     // ... filter to delete one WsTicket
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WsTicketDeleteArgs>(args: SelectSubset<T, WsTicketDeleteArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WsTicket.
+     * @param {WsTicketUpdateArgs} args - Arguments to update one WsTicket.
+     * @example
+     * // Update one WsTicket
+     * const wsTicket = await prisma.wsTicket.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WsTicketUpdateArgs>(args: SelectSubset<T, WsTicketUpdateArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WsTickets.
+     * @param {WsTicketDeleteManyArgs} args - Arguments to filter WsTickets to delete.
+     * @example
+     * // Delete a few WsTickets
+     * const { count } = await prisma.wsTicket.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WsTicketDeleteManyArgs>(args?: SelectSubset<T, WsTicketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WsTickets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WsTickets
+     * const wsTicket = await prisma.wsTicket.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WsTicketUpdateManyArgs>(args: SelectSubset<T, WsTicketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WsTickets and returns the data updated in the database.
+     * @param {WsTicketUpdateManyAndReturnArgs} args - Arguments to update many WsTickets.
+     * @example
+     * // Update many WsTickets
+     * const wsTicket = await prisma.wsTicket.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more WsTickets and only return the `id`
+     * const wsTicketWithIdOnly = await prisma.wsTicket.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends WsTicketUpdateManyAndReturnArgs>(args: SelectSubset<T, WsTicketUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one WsTicket.
+     * @param {WsTicketUpsertArgs} args - Arguments to update or create a WsTicket.
+     * @example
+     * // Update or create a WsTicket
+     * const wsTicket = await prisma.wsTicket.upsert({
+     *   create: {
+     *     // ... data to create a WsTicket
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WsTicket we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WsTicketUpsertArgs>(args: SelectSubset<T, WsTicketUpsertArgs<ExtArgs>>): Prisma__WsTicketClient<$Result.GetResult<Prisma.$WsTicketPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WsTickets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketCountArgs} args - Arguments to filter WsTickets to count.
+     * @example
+     * // Count the number of WsTickets
+     * const count = await prisma.wsTicket.count({
+     *   where: {
+     *     // ... the filter for the WsTickets we want to count
+     *   }
+     * })
+    **/
+    count<T extends WsTicketCountArgs>(
+      args?: Subset<T, WsTicketCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WsTicketCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WsTicket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WsTicketAggregateArgs>(args: Subset<T, WsTicketAggregateArgs>): Prisma.PrismaPromise<GetWsTicketAggregateType<T>>
+
+    /**
+     * Group by WsTicket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WsTicketGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WsTicketGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WsTicketGroupByArgs['orderBy'] }
+        : { orderBy?: WsTicketGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WsTicketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWsTicketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WsTicket model
+   */
+  readonly fields: WsTicketFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WsTicket.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WsTicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WsTicket model
+   */
+  interface WsTicketFieldRefs {
+    readonly id: FieldRef<"WsTicket", 'String'>
+    readonly token: FieldRef<"WsTicket", 'String'>
+    readonly userId: FieldRef<"WsTicket", 'String'>
+    readonly expiresAt: FieldRef<"WsTicket", 'DateTime'>
+    readonly used: FieldRef<"WsTicket", 'Boolean'>
+    readonly createdAt: FieldRef<"WsTicket", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WsTicket findUnique
+   */
+  export type WsTicketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter, which WsTicket to fetch.
+     */
+    where: WsTicketWhereUniqueInput
+  }
+
+  /**
+   * WsTicket findUniqueOrThrow
+   */
+  export type WsTicketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter, which WsTicket to fetch.
+     */
+    where: WsTicketWhereUniqueInput
+  }
+
+  /**
+   * WsTicket findFirst
+   */
+  export type WsTicketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter, which WsTicket to fetch.
+     */
+    where?: WsTicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WsTickets to fetch.
+     */
+    orderBy?: WsTicketOrderByWithRelationInput | WsTicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WsTickets.
+     */
+    cursor?: WsTicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WsTickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WsTickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WsTickets.
+     */
+    distinct?: WsTicketScalarFieldEnum | WsTicketScalarFieldEnum[]
+  }
+
+  /**
+   * WsTicket findFirstOrThrow
+   */
+  export type WsTicketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter, which WsTicket to fetch.
+     */
+    where?: WsTicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WsTickets to fetch.
+     */
+    orderBy?: WsTicketOrderByWithRelationInput | WsTicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WsTickets.
+     */
+    cursor?: WsTicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WsTickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WsTickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WsTickets.
+     */
+    distinct?: WsTicketScalarFieldEnum | WsTicketScalarFieldEnum[]
+  }
+
+  /**
+   * WsTicket findMany
+   */
+  export type WsTicketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter, which WsTickets to fetch.
+     */
+    where?: WsTicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WsTickets to fetch.
+     */
+    orderBy?: WsTicketOrderByWithRelationInput | WsTicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WsTickets.
+     */
+    cursor?: WsTicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WsTickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WsTickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WsTickets.
+     */
+    distinct?: WsTicketScalarFieldEnum | WsTicketScalarFieldEnum[]
+  }
+
+  /**
+   * WsTicket create
+   */
+  export type WsTicketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * The data needed to create a WsTicket.
+     */
+    data: XOR<WsTicketCreateInput, WsTicketUncheckedCreateInput>
+  }
+
+  /**
+   * WsTicket createMany
+   */
+  export type WsTicketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WsTickets.
+     */
+    data: WsTicketCreateManyInput | WsTicketCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WsTicket createManyAndReturn
+   */
+  export type WsTicketCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * The data used to create many WsTickets.
+     */
+    data: WsTicketCreateManyInput | WsTicketCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * WsTicket update
+   */
+  export type WsTicketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * The data needed to update a WsTicket.
+     */
+    data: XOR<WsTicketUpdateInput, WsTicketUncheckedUpdateInput>
+    /**
+     * Choose, which WsTicket to update.
+     */
+    where: WsTicketWhereUniqueInput
+  }
+
+  /**
+   * WsTicket updateMany
+   */
+  export type WsTicketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WsTickets.
+     */
+    data: XOR<WsTicketUpdateManyMutationInput, WsTicketUncheckedUpdateManyInput>
+    /**
+     * Filter which WsTickets to update
+     */
+    where?: WsTicketWhereInput
+    /**
+     * Limit how many WsTickets to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WsTicket updateManyAndReturn
+   */
+  export type WsTicketUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * The data used to update WsTickets.
+     */
+    data: XOR<WsTicketUpdateManyMutationInput, WsTicketUncheckedUpdateManyInput>
+    /**
+     * Filter which WsTickets to update
+     */
+    where?: WsTicketWhereInput
+    /**
+     * Limit how many WsTickets to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * WsTicket upsert
+   */
+  export type WsTicketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * The filter to search for the WsTicket to update in case it exists.
+     */
+    where: WsTicketWhereUniqueInput
+    /**
+     * In case the WsTicket found by the `where` argument doesn't exist, create a new WsTicket with this data.
+     */
+    create: XOR<WsTicketCreateInput, WsTicketUncheckedCreateInput>
+    /**
+     * In case the WsTicket was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WsTicketUpdateInput, WsTicketUncheckedUpdateInput>
+  }
+
+  /**
+   * WsTicket delete
+   */
+  export type WsTicketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+    /**
+     * Filter which WsTicket to delete.
+     */
+    where: WsTicketWhereUniqueInput
+  }
+
+  /**
+   * WsTicket deleteMany
+   */
+  export type WsTicketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WsTickets to delete
+     */
+    where?: WsTicketWhereInput
+    /**
+     * Limit how many WsTickets to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WsTicket without action
+   */
+  export type WsTicketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WsTicket
+     */
+    select?: WsTicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WsTicket
+     */
+    omit?: WsTicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WsTicketInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22665,6 +23869,18 @@ export namespace Prisma {
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+  export const WsTicketScalarFieldEnum: {
+    id: 'id',
+    token: 'token',
+    userId: 'userId',
+    expiresAt: 'expiresAt',
+    used: 'used',
+    createdAt: 'createdAt'
+  };
+
+  export type WsTicketScalarFieldEnum = (typeof WsTicketScalarFieldEnum)[keyof typeof WsTicketScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -22840,6 +24056,7 @@ export namespace Prisma {
     following?: FollowListRelationFilter
     notifications?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
+    wsTickets?: WsTicketListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -22863,6 +24080,7 @@ export namespace Prisma {
     following?: FollowOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
     sentNotifications?: NotificationOrderByRelationAggregateInput
+    wsTickets?: WsTicketOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -22889,6 +24107,7 @@ export namespace Prisma {
     following?: FollowListRelationFilter
     notifications?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
+    wsTickets?: WsTicketListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -23992,6 +25211,66 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
   }
 
+  export type WsTicketWhereInput = {
+    AND?: WsTicketWhereInput | WsTicketWhereInput[]
+    OR?: WsTicketWhereInput[]
+    NOT?: WsTicketWhereInput | WsTicketWhereInput[]
+    id?: StringFilter<"WsTicket"> | string
+    token?: StringFilter<"WsTicket"> | string
+    userId?: StringFilter<"WsTicket"> | string
+    expiresAt?: DateTimeFilter<"WsTicket"> | Date | string
+    used?: BoolFilter<"WsTicket"> | boolean
+    createdAt?: DateTimeFilter<"WsTicket"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type WsTicketOrderByWithRelationInput = {
+    id?: SortOrder
+    token?: SortOrder
+    userId?: SortOrder
+    expiresAt?: SortOrder
+    used?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type WsTicketWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    token?: string
+    AND?: WsTicketWhereInput | WsTicketWhereInput[]
+    OR?: WsTicketWhereInput[]
+    NOT?: WsTicketWhereInput | WsTicketWhereInput[]
+    userId?: StringFilter<"WsTicket"> | string
+    expiresAt?: DateTimeFilter<"WsTicket"> | Date | string
+    used?: BoolFilter<"WsTicket"> | boolean
+    createdAt?: DateTimeFilter<"WsTicket"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "token">
+
+  export type WsTicketOrderByWithAggregationInput = {
+    id?: SortOrder
+    token?: SortOrder
+    userId?: SortOrder
+    expiresAt?: SortOrder
+    used?: SortOrder
+    createdAt?: SortOrder
+    _count?: WsTicketCountOrderByAggregateInput
+    _max?: WsTicketMaxOrderByAggregateInput
+    _min?: WsTicketMinOrderByAggregateInput
+  }
+
+  export type WsTicketScalarWhereWithAggregatesInput = {
+    AND?: WsTicketScalarWhereWithAggregatesInput | WsTicketScalarWhereWithAggregatesInput[]
+    OR?: WsTicketScalarWhereWithAggregatesInput[]
+    NOT?: WsTicketScalarWhereWithAggregatesInput | WsTicketScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"WsTicket"> | string
+    token?: StringWithAggregatesFilter<"WsTicket"> | string
+    userId?: StringWithAggregatesFilter<"WsTicket"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"WsTicket"> | Date | string
+    used?: BoolWithAggregatesFilter<"WsTicket"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"WsTicket"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     username: string
@@ -24013,6 +25292,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24036,6 +25316,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -24059,6 +25340,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24082,6 +25364,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -25177,6 +26460,68 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type WsTicketCreateInput = {
+    id?: string
+    token: string
+    expiresAt: Date | string
+    used?: boolean
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutWsTicketsInput
+  }
+
+  export type WsTicketUncheckedCreateInput = {
+    id?: string
+    token: string
+    userId: string
+    expiresAt: Date | string
+    used?: boolean
+    createdAt?: Date | string
+  }
+
+  export type WsTicketUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutWsTicketsNestedInput
+  }
+
+  export type WsTicketUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WsTicketCreateManyInput = {
+    id?: string
+    token: string
+    userId: string
+    expiresAt: Date | string
+    used?: boolean
+    createdAt?: Date | string
+  }
+
+  export type WsTicketUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WsTicketUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -25289,6 +26634,12 @@ export namespace Prisma {
     none?: NotificationWhereInput
   }
 
+  export type WsTicketListRelationFilter = {
+    every?: WsTicketWhereInput
+    some?: WsTicketWhereInput
+    none?: WsTicketWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -25335,6 +26686,10 @@ export namespace Prisma {
   }
 
   export type NotificationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type WsTicketOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26213,6 +27568,33 @@ export namespace Prisma {
     expiresAt?: SortOrder
   }
 
+  export type WsTicketCountOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    userId?: SortOrder
+    expiresAt?: SortOrder
+    used?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type WsTicketMaxOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    userId?: SortOrder
+    expiresAt?: SortOrder
+    used?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type WsTicketMinOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    userId?: SortOrder
+    expiresAt?: SortOrder
+    used?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type ProfileCreateNestedOneWithoutUserInput = {
     create?: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ProfileCreateOrConnectWithoutUserInput
@@ -26310,6 +27692,13 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type WsTicketCreateNestedManyWithoutUserInput = {
+    create?: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput> | WsTicketCreateWithoutUserInput[] | WsTicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WsTicketCreateOrConnectWithoutUserInput | WsTicketCreateOrConnectWithoutUserInput[]
+    createMany?: WsTicketCreateManyUserInputEnvelope
+    connect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+  }
+
   export type ProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ProfileCreateOrConnectWithoutUserInput
@@ -26405,6 +27794,13 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutActorInput | NotificationCreateOrConnectWithoutActorInput[]
     createMany?: NotificationCreateManyActorInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type WsTicketUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput> | WsTicketCreateWithoutUserInput[] | WsTicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WsTicketCreateOrConnectWithoutUserInput | WsTicketCreateOrConnectWithoutUserInput[]
+    createMany?: WsTicketCreateManyUserInputEnvelope
+    connect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -26611,6 +28007,20 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
+  export type WsTicketUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput> | WsTicketCreateWithoutUserInput[] | WsTicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WsTicketCreateOrConnectWithoutUserInput | WsTicketCreateOrConnectWithoutUserInput[]
+    upsert?: WsTicketUpsertWithWhereUniqueWithoutUserInput | WsTicketUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WsTicketCreateManyUserInputEnvelope
+    set?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    disconnect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    delete?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    connect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    update?: WsTicketUpdateWithWhereUniqueWithoutUserInput | WsTicketUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WsTicketUpdateManyWithWhereWithoutUserInput | WsTicketUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WsTicketScalarWhereInput | WsTicketScalarWhereInput[]
+  }
+
   export type ProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ProfileCreateOrConnectWithoutUserInput
@@ -26801,6 +28211,20 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutActorInput | NotificationUpdateWithWhereUniqueWithoutActorInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutActorInput | NotificationUpdateManyWithWhereWithoutActorInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type WsTicketUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput> | WsTicketCreateWithoutUserInput[] | WsTicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WsTicketCreateOrConnectWithoutUserInput | WsTicketCreateOrConnectWithoutUserInput[]
+    upsert?: WsTicketUpsertWithWhereUniqueWithoutUserInput | WsTicketUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WsTicketCreateManyUserInputEnvelope
+    set?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    disconnect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    delete?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    connect?: WsTicketWhereUniqueInput | WsTicketWhereUniqueInput[]
+    update?: WsTicketUpdateWithWhereUniqueWithoutUserInput | WsTicketUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WsTicketUpdateManyWithWhereWithoutUserInput | WsTicketUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WsTicketScalarWhereInput | WsTicketScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -27994,6 +29418,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
   }
 
+  export type UserCreateNestedOneWithoutWsTicketsInput = {
+    create?: XOR<UserCreateWithoutWsTicketsInput, UserUncheckedCreateWithoutWsTicketsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWsTicketsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutWsTicketsNestedInput = {
+    create?: XOR<UserCreateWithoutWsTicketsInput, UserUncheckedCreateWithoutWsTicketsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWsTicketsInput
+    upsert?: UserUpsertWithoutWsTicketsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWsTicketsInput, UserUpdateWithoutWsTicketsInput>, UserUncheckedUpdateWithoutWsTicketsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -28662,6 +30100,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type WsTicketCreateWithoutUserInput = {
+    id?: string
+    token: string
+    expiresAt: Date | string
+    used?: boolean
+    createdAt?: Date | string
+  }
+
+  export type WsTicketUncheckedCreateWithoutUserInput = {
+    id?: string
+    token: string
+    expiresAt: Date | string
+    used?: boolean
+    createdAt?: Date | string
+  }
+
+  export type WsTicketCreateOrConnectWithoutUserInput = {
+    where: WsTicketWhereUniqueInput
+    create: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput>
+  }
+
+  export type WsTicketCreateManyUserInputEnvelope = {
+    data: WsTicketCreateManyUserInput | WsTicketCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProfileUpsertWithoutUserInput = {
     update: XOR<ProfileUpdateWithoutUserInput, ProfileUncheckedUpdateWithoutUserInput>
     create: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
@@ -29034,6 +30498,34 @@ export namespace Prisma {
     data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutActorInput>
   }
 
+  export type WsTicketUpsertWithWhereUniqueWithoutUserInput = {
+    where: WsTicketWhereUniqueInput
+    update: XOR<WsTicketUpdateWithoutUserInput, WsTicketUncheckedUpdateWithoutUserInput>
+    create: XOR<WsTicketCreateWithoutUserInput, WsTicketUncheckedCreateWithoutUserInput>
+  }
+
+  export type WsTicketUpdateWithWhereUniqueWithoutUserInput = {
+    where: WsTicketWhereUniqueInput
+    data: XOR<WsTicketUpdateWithoutUserInput, WsTicketUncheckedUpdateWithoutUserInput>
+  }
+
+  export type WsTicketUpdateManyWithWhereWithoutUserInput = {
+    where: WsTicketScalarWhereInput
+    data: XOR<WsTicketUpdateManyMutationInput, WsTicketUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type WsTicketScalarWhereInput = {
+    AND?: WsTicketScalarWhereInput | WsTicketScalarWhereInput[]
+    OR?: WsTicketScalarWhereInput[]
+    NOT?: WsTicketScalarWhereInput | WsTicketScalarWhereInput[]
+    id?: StringFilter<"WsTicket"> | string
+    token?: StringFilter<"WsTicket"> | string
+    userId?: StringFilter<"WsTicket"> | string
+    expiresAt?: DateTimeFilter<"WsTicket"> | Date | string
+    used?: BoolFilter<"WsTicket"> | boolean
+    createdAt?: DateTimeFilter<"WsTicket"> | Date | string
+  }
+
   export type UserCreateWithoutProfileInput = {
     id?: string
     username: string
@@ -29054,6 +30546,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -29076,6 +30569,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -29114,6 +30608,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -29136,6 +30631,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type LogEntryCreateWithoutGameInput = {
@@ -29628,6 +31124,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLogEntriesInput = {
@@ -29650,6 +31147,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLogEntriesInput = {
@@ -29800,6 +31298,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLogEntriesInput = {
@@ -29822,6 +31321,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GameUpsertWithoutLogEntriesInput = {
@@ -29954,6 +31454,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
@@ -29976,6 +31477,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReviewsInput = {
@@ -30204,6 +31706,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -30226,6 +31729,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GameUpsertWithoutReviewsInput = {
@@ -30406,6 +31910,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutWatchlistInput = {
@@ -30428,6 +31933,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutWatchlistInput = {
@@ -30513,6 +32019,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutWatchlistInput = {
@@ -30535,6 +32042,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GameUpsertWithoutWatchlistItemsInput = {
@@ -30610,6 +32118,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutListsInput = {
@@ -30632,6 +32141,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutListsInput = {
@@ -30722,6 +32232,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListsInput = {
@@ -30744,6 +32255,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ListItemUpsertWithWhereUniqueWithoutListInput = {
@@ -30958,6 +32470,7 @@ export namespace Prisma {
     followers?: FollowCreateNestedManyWithoutFollowingInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFollowingInput = {
@@ -30980,6 +32493,7 @@ export namespace Prisma {
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFollowingInput = {
@@ -31007,6 +32521,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFollowersInput = {
@@ -31029,6 +32544,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFollowersInput = {
@@ -31067,6 +32583,7 @@ export namespace Prisma {
     followers?: FollowUpdateManyWithoutFollowingNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFollowingInput = {
@@ -31089,6 +32606,7 @@ export namespace Prisma {
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutFollowersInput = {
@@ -31122,6 +32640,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFollowersInput = {
@@ -31144,6 +32663,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutReviewLikesInput = {
@@ -31166,6 +32686,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReviewLikesInput = {
@@ -31188,6 +32709,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReviewLikesInput = {
@@ -31261,6 +32783,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewLikesInput = {
@@ -31283,6 +32806,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReviewUpsertWithoutLikesInput = {
@@ -31346,6 +32870,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommentsInput = {
@@ -31368,6 +32893,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCommentsInput = {
@@ -31471,6 +32997,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -31493,6 +33020,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReviewUpsertWithoutCommentsInput = {
@@ -31572,6 +33100,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -31594,6 +33123,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -31776,6 +33306,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -31798,6 +33329,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GameUpsertWithoutActivitiesInput = {
@@ -31988,6 +33520,7 @@ export namespace Prisma {
     followers?: FollowCreateNestedManyWithoutFollowingInput
     following?: FollowCreateNestedManyWithoutFollowerInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -32010,6 +33543,7 @@ export namespace Prisma {
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -32037,6 +33571,7 @@ export namespace Prisma {
     followers?: FollowCreateNestedManyWithoutFollowingInput
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSentNotificationsInput = {
@@ -32059,6 +33594,7 @@ export namespace Prisma {
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSentNotificationsInput = {
@@ -32155,6 +33691,7 @@ export namespace Prisma {
     followers?: FollowUpdateManyWithoutFollowingNestedInput
     following?: FollowUpdateManyWithoutFollowerNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -32177,6 +33714,7 @@ export namespace Prisma {
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutSentNotificationsInput = {
@@ -32210,6 +33748,7 @@ export namespace Prisma {
     followers?: FollowUpdateManyWithoutFollowingNestedInput
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentNotificationsInput = {
@@ -32232,6 +33771,7 @@ export namespace Prisma {
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReviewUpsertWithoutNotificationsInput = {
@@ -32324,6 +33864,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -32346,6 +33887,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -32384,6 +33926,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -32406,6 +33949,7 @@ export namespace Prisma {
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -32428,6 +33972,7 @@ export namespace Prisma {
     following?: FollowCreateNestedManyWithoutFollowerInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -32450,6 +33995,7 @@ export namespace Prisma {
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    wsTickets?: WsTicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -32488,6 +34034,7 @@ export namespace Prisma {
     following?: FollowUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -32506,6 +34053,115 @@ export namespace Prisma {
     comments?: CommentUncheckedUpdateManyWithoutUserNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutActorNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
+    following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    wsTickets?: WsTicketUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutWsTicketsInput = {
+    id?: string
+    username: string
+    email: string
+    passwordHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileCreateNestedOneWithoutUserInput
+    logEntries?: LogEntryCreateNestedManyWithoutUserInput
+    reviews?: ReviewCreateNestedManyWithoutUserInput
+    lists?: ListCreateNestedManyWithoutUserInput
+    watchlist?: WatchlistItemCreateNestedManyWithoutUserInput
+    reviewLikes?: ReviewLikeCreateNestedManyWithoutUserInput
+    comments?: CommentCreateNestedManyWithoutUserInput
+    activities?: ActivityCreateNestedManyWithoutActorInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    followers?: FollowCreateNestedManyWithoutFollowingInput
+    following?: FollowCreateNestedManyWithoutFollowerInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutActorInput
+  }
+
+  export type UserUncheckedCreateWithoutWsTicketsInput = {
+    id?: string
+    username: string
+    email: string
+    passwordHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
+    logEntries?: LogEntryUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutUserInput
+    lists?: ListUncheckedCreateNestedManyWithoutUserInput
+    watchlist?: WatchlistItemUncheckedCreateNestedManyWithoutUserInput
+    reviewLikes?: ReviewLikeUncheckedCreateNestedManyWithoutUserInput
+    comments?: CommentUncheckedCreateNestedManyWithoutUserInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutActorInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
+    following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+  }
+
+  export type UserCreateOrConnectWithoutWsTicketsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWsTicketsInput, UserUncheckedCreateWithoutWsTicketsInput>
+  }
+
+  export type UserUpsertWithoutWsTicketsInput = {
+    update: XOR<UserUpdateWithoutWsTicketsInput, UserUncheckedUpdateWithoutWsTicketsInput>
+    create: XOR<UserCreateWithoutWsTicketsInput, UserUncheckedCreateWithoutWsTicketsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutWsTicketsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutWsTicketsInput, UserUncheckedUpdateWithoutWsTicketsInput>
+  }
+
+  export type UserUpdateWithoutWsTicketsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUpdateOneWithoutUserNestedInput
+    logEntries?: LogEntryUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUpdateManyWithoutUserNestedInput
+    lists?: ListUpdateManyWithoutUserNestedInput
+    watchlist?: WatchlistItemUpdateManyWithoutUserNestedInput
+    reviewLikes?: ReviewLikeUpdateManyWithoutUserNestedInput
+    comments?: CommentUpdateManyWithoutUserNestedInput
+    activities?: ActivityUpdateManyWithoutActorNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    followers?: FollowUpdateManyWithoutFollowingNestedInput
+    following?: FollowUpdateManyWithoutFollowerNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutActorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutWsTicketsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
+    logEntries?: LogEntryUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutUserNestedInput
+    lists?: ListUncheckedUpdateManyWithoutUserNestedInput
+    watchlist?: WatchlistItemUncheckedUpdateManyWithoutUserNestedInput
+    reviewLikes?: ReviewLikeUncheckedUpdateManyWithoutUserNestedInput
+    comments?: CommentUncheckedUpdateManyWithoutUserNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutActorNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -32615,6 +34271,14 @@ export namespace Prisma {
     reviewId?: string | null
     commentId?: string | null
     read?: boolean
+    createdAt?: Date | string
+  }
+
+  export type WsTicketCreateManyUserInput = {
+    id?: string
+    token: string
+    expiresAt: Date | string
+    used?: boolean
     createdAt?: Date | string
   }
 
@@ -32951,6 +34615,30 @@ export namespace Prisma {
     reviewId?: NullableStringFieldUpdateOperationsInput | string | null
     commentId?: NullableStringFieldUpdateOperationsInput | string | null
     read?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WsTicketUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WsTicketUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WsTicketUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
