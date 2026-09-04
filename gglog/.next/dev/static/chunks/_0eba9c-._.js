@@ -586,6 +586,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 //   - Subscribe/unsubscribe pattern
 //   - Graceful degradation (dashboard still works without WS)
 //   - Connection lifecycle management
+//   - Ticket-based authentication for cross-domain
+//     production deployments (Vercel → Render)
 //
 // Usage:
 //   const unsub = notificationSocket.subscribe((notification) => {
@@ -606,6 +608,37 @@ const DEFAULT_WS_URL = 'ws://localhost:3001';
 const INITIAL_RETRY_MS = 1000;
 const MAX_RETRY_MS = 30_000;
 const BACKOFF_FACTOR = 2;
+// ---- Ticket fetching ----
+/**
+ * Fetch a short-lived WebSocket authentication ticket from the
+ * Vercel backend. The backend validates the gglog_session cookie
+ * and returns a single-use ticket token.
+ *
+ * Returns null if the fetch fails (user not authenticated,
+ * network error, etc.). The client will fall back to cookie-based
+ * auth for local development.
+ */ async function fetchWsTicket() {
+    try {
+        const res = await fetch('/api/auth/ws-ticket', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (json.success && json.data?.ticket) {
+            return json.data.ticket;
+        }
+        return null;
+    } catch  {
+        if ("TURBOPACK compile-time truthy", 1) {
+            console.log('[WS] Failed to fetch WS ticket (will try cookie auth)');
+        }
+        return null;
+    }
+}
 // ---- Client ----
 class NotificationSocketClient {
     socket = null;
@@ -619,9 +652,13 @@ class NotificationSocketClient {
     }
     /**
    * Open a WebSocket connection.
-   * The browser will send cookies automatically (same-origin),
-   * enabling session-based authentication.
-   */ connect() {
+   *
+   * Production: fetches a short-lived ticket from the Vercel
+   * backend, then connects with ?ticket=<token>.
+   *
+   * Local dev: if ticket fetch fails, connects without a ticket
+   * (cookie-based auth works same-origin).
+   */ async connect() {
         // Don't connect on the server (SSR)
         if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
         ;
@@ -631,7 +668,10 @@ class NotificationSocketClient {
         }
         this.intentionalClose = false;
         this.clearRetryTimer();
-        const wsUrl = ("TURBOPACK compile-time value", "ws://localhost:3001") ?? DEFAULT_WS_URL;
+        const baseUrl = ("TURBOPACK compile-time value", "ws://localhost:3001") ?? DEFAULT_WS_URL;
+        // Fetch a ticket for cross-domain auth
+        const ticket = await fetchWsTicket();
+        const wsUrl = ticket ? `${baseUrl}?ticket=${encodeURIComponent(ticket)}` : baseUrl;
         try {
             this.socket = new WebSocket(wsUrl);
         } catch  {
