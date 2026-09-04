@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { signupSchema } from '@/lib/validations/auth'
 import { apiSuccess, apiError, Errors } from '@/lib/errors'
 import { createSession, sanitizeUser } from '@/lib/auth'
+import { getClientIp, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 
 // ============================================
 // POST /api/auth/signup
@@ -11,6 +12,11 @@ import { createSession, sanitizeUser } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
+    // ---- Rate limiting (fail-closed) ----
+    const ip = getClientIp(request)
+    const rl = rateLimit(`signup:${ip}`, RATE_LIMITS.signup)
+    if (!rl.success) return rateLimitResponse(rl)
+
     // ---- Parse & validate body ----
     const body = await request.json().catch(() => null)
     if (!body) {

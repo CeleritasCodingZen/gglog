@@ -11,9 +11,19 @@
 import { NextRequest } from "next/server"
 import { searchGames, getGameByIGDBId, normalizeImage } from "@/lib/idgb/games"
 import { apiSuccess, apiError, Errors } from "@/lib/errors"
+import { getClientIp, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function GET(request: NextRequest) {
   try {
+    // ---- Rate limiting (fail-open for search) ----
+    try {
+      const ip = getClientIp(request)
+      const rl = rateLimit(`search:${ip}`, RATE_LIMITS.gameSearch)
+      if (!rl.success) return rateLimitResponse(rl)
+    } catch {
+      // Fail-open: if rate limiter errors, allow the search to proceed.
+      // Search availability is prioritized; IGDB has its own quotas.
+    }
     const { searchParams } = request.nextUrl
     const query = searchParams.get("q")?.trim()
 

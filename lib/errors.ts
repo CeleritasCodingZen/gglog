@@ -39,6 +39,9 @@ export const Errors = {
   conflict: (message: string) =>
     new AppError(409, 'CONFLICT', message),
 
+  rateLimited: () =>
+    new AppError(429, 'RATE_LIMITED', 'Too many requests. Please try again later.'),
+
   internal: () =>
     new AppError(500, 'INTERNAL_ERROR', 'An unexpected error occurred.'),
 } as const

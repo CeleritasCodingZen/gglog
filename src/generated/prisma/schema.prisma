@@ -364,6 +364,7 @@ model Notification {
 
   @@index([userId, createdAt])
   @@index([userId, read])
+  @@index([createdAt])
 }
 
 // ============================================

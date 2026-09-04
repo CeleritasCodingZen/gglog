@@ -4,11 +4,16 @@ import { prisma } from '@/lib/db'
 import { signinSchema } from '@/lib/validations/auth'
 import { apiSuccess, apiError, Errors } from '@/lib/errors'
 import { createSession, sanitizeUser } from '@/lib/auth'
+import { getClientIp, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 
 
 export async function POST(request: NextRequest) {
   try {
-    
+    // ---- Rate limiting (fail-closed) ----
+    const ip = getClientIp(request)
+    const rl = rateLimit(`signin:${ip}`, RATE_LIMITS.signin)
+    if (!rl.success) return rateLimitResponse(rl)
+
     const body = await request.json().catch(() => null)
     if (!body) {
       return apiError(Errors.badRequest('Request body is required.'))

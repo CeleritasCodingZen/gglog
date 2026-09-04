@@ -60,9 +60,21 @@ const WS_PORT = parseInt(
 )
 
 const WS_POLL_INTERVAL_MS = parseInt(
-  process.env.WS_POLL_INTERVAL_MS ?? '2000',
+  process.env.WS_POLL_INTERVAL_MS ?? '3000',
   10
 )
+
+/** Maximum notifications to fetch per poll cycle. */
+const POLL_BATCH_SIZE = 100
+
+/** Promise-based delay for the sequential polling loop. */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+// ---- Shutdown flag (used by polling loop and shutdown handler) ----
+
+let isShuttingDown = false
 
 /**
  * Parse allowed origins from the WS_ALLOWED_ORIGINS env var.
@@ -465,26 +477,19 @@ function trackDeliveredId(id: string): void {
 }
 
 async function pollNotifications(): Promise<void> {
-  const connectedUserIds = connectionManager.connectedUserIds
-  if (connectedUserIds.length === 0) {
-    lastPollTime = new Date()
-    return
-  }
-
   try {
     const newNotifications = await prisma.notification.findMany({
       where: {
-        userId: { in: connectedUserIds },
+        userId: { in: connectionManager.connectedUserIds },
         createdAt: { gt: lastPollTime },
       },
       orderBy: { createdAt: 'asc' },
+      take: POLL_BATCH_SIZE,
       select: {
         ...notificationPollSelect,
         userId: true,
       },
     })
-
-    const now = new Date()
 
     for (const row of newNotifications) {
       // Skip if already delivered (by emitter or previous poll)
@@ -502,13 +507,40 @@ async function pollNotifications(): Promise<void> {
       }
     }
 
-    lastPollTime = now
+    // Advance the watermark:
+    // - If we got results, advance to the last notification's createdAt.
+    //   This ensures that if we hit the batch limit (POLL_BATCH_SIZE),
+    //   remaining notifications will be picked up on the next poll.
+    // - If no results, advance to now — nothing was missed.
+    if (newNotifications.length > 0) {
+      lastPollTime = newNotifications[newNotifications.length - 1].createdAt
+    } else {
+      lastPollTime = new Date()
+    }
   } catch (err) {
+    // Polling errors are non-fatal: log and continue.
+    // The next poll cycle will retry. Do not crash the process.
     console.error('[WS] Notification poll failed:', err)
   }
 }
 
-const pollInterval = setInterval(pollNotifications, WS_POLL_INTERVAL_MS)
+// ---- Sequential polling loop ----
+// Replaces setInterval to guarantee:
+// - No overlapping DB queries (sequential await)
+// - No polling when zero users connected (skip iteration)
+// - Clean shutdown (loop exits when isShuttingDown is true)
+
+async function runPollingLoop(): Promise<void> {
+  while (!isShuttingDown) {
+    if (connectionManager.connectedUserCount > 0) {
+      await pollNotifications()
+    }
+    await sleep(WS_POLL_INTERVAL_MS)
+  }
+}
+
+// Start the polling loop (fire-and-forget; errors are caught internally)
+runPollingLoop()
 
 // ---- Ticket cleanup (every 5 minutes) ----
 
@@ -534,8 +566,6 @@ const ticketCleanupInterval = setInterval(async () => {
 
 // ---- Graceful shutdown ----
 
-let isShuttingDown = false
-
 async function gracefulShutdown(signal: string): Promise<void> {
   if (isShuttingDown) return
   isShuttingDown = true
@@ -545,9 +575,8 @@ async function gracefulShutdown(signal: string): Promise<void> {
   // Stop accepting new connections
   httpServer.close()
 
-  // Clear all intervals
+  // Clear intervals (polling loop exits via isShuttingDown flag)
   clearInterval(pingInterval)
-  clearInterval(pollInterval)
   clearInterval(ticketCleanupInterval)
 
   // Close all WebSocket connections
