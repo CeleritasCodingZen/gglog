@@ -1,848 +1,871 @@
-# GGLOG — Senior Software Architect & Codebase Production Readiness Audit
+# GGLOG — Beta Production Readiness Audit
 
-**Project:** GGLOG ("Letterboxd for Video Games")  
-**Audit Type:** Complete Architecture, Relational Schema, Realtime Subsystems & Production-Readiness Assessment  
-**Execution Mode:** Strictly Read-Only (Zero Code/Database Modifications)  
-**Evaluator:** Senior Software Architect & Codebase Auditor  
-**Date of Audit:** September 4, 2026  
-**Repository Working Directory:** `d:\gglog\gglog`  
-**Document Classification:** Technical Architecture Audit & Deployment Readiness Report  
+**Audit Date:** September 24, 2026  
+**Repository Branch:** `main`  
+**Commit Examined:** `1e93d26` (with working tree verification)  
+**Audit Type:** Full Beta Production Readiness Audit  
+**Scope:** Application, API, database, authentication, realtime infrastructure, deployment, security, performance, frontend integration, and production configuration.  
+**Verification Environment:** Node.js v20.x, TypeScript 5.x, Next.js 16.3.0 (Turbopack), Prisma 7.9.1, PostgreSQL (Neon Serverless)  
+**Overall Status:** 🟡 **NEARLY READY — 3 BLOCKERS REMAIN**  
 
 ---
 
 ## Table of Contents
 
-1. [Executive Summary & System Topology](#executive-summary--system-topology)
-2. [Section 1 — High-Level Architecture & Repository Organization](#section-1--high-level-architecture--repository-organization)
-3. [Section 2 — Request / Response Lifecycle & Communication Patterns](#section-2--request--response-lifecycle--communication-patterns)
-4. [Section 3 — Authentication, Session Management & Cookie Security](#section-3--authentication-session-management--cookie-security)
-5. [Section 4 — Database Schema, Relational Integrity & Neon Performance](#section-4--database-schema-relational-integrity--neon-performance)
-6. [Section 5 — Follow System & Social Graph Audit](#section-5--follow-system--social-graph-audit)
-7. [Section 6 — Review & Rating Subsystem Audit](#section-6--review--rating-subsystem-audit)
-8. [Section 7 — Social Likes Subsystem Audit](#section-7--social-likes-subsystem-audit)
-9. [Section 8 — Comment Subsystem Audit](#section-8--comment-subsystem-audit)
-10. [Section 9 — Discover Page & Subcomponents Audit](#section-9--discover-page--subcomponents-audit)
-11. [Section 10 — Profile Subsystem & Mock Data Contamination Audit](#section-10--profile-subsystem--mock-data-contamination-audit)
-12. [Section 11 — Realtime Notification Subsystem Audit](#section-11--realtime-notification-subsystem-audit)
-13. [Section 12 — Standalone WebSocket Server Architecture (`server/ws.ts`)](#section-12--standalone-websocket-server-architecture-serverwsts)
-14. [Section 13 — Client-Side WebSocket Integration & Reconnection Audit](#section-13--client-side-websocket-integration--reconnection-audit)
-15. [Section 14 — Environment Variables Audit](#section-14--environment-variables-audit)
-16. [Section 15 — Localhost & Hardcoded Network Address Audit](#section-15--localhost--hardcoded-network-address-audit)
-17. [Section 16 — Vercel Production Readiness Assessment](#section-16--vercel-production-readiness-assessment)
-18. [Section 17 — Render WebSocket Readiness Assessment](#section-17--render-websocket-readiness-assessment)
-19. [Section 18 — Complete Backend API Route Inventory](#section-18--complete-backend-api-route-inventory)
-20. [Section 19 — Complete Frontend Component & Page Inventory](#section-19--complete-frontend-component--page-inventory)
-21. [Section 20 — Comprehensive Security & Vulnerability Audit](#section-20--comprehensive-security--vulnerability-audit)
-22. [Section 21 — Performance, Database Query & Scalability Analysis](#section-21--performance-database-query--scalability-analysis)
-23. [Section 22 — Current State Implementation Matrix](#section-22--current-state-implementation-matrix)
-24. [Section 23 — Exact Remaining Work Prioritization](#section-23--exact-remaining-work-prioritization)
-25. [Section 24 — Top 10 Critical Architectural Findings & Remediation](#section-24--top-10-critical-architectural-findings--remediation)
-26. [Architectural Verdict & Production Sign-Off](#architectural-verdict--production-sign-off)
+1. [Executive Summary](#1-executive-summary)
+2. [System Architecture](#2-system-architecture)
+   - [2.1 Frontend / API Layer](#21-frontend--api-layer)
+   - [2.2 Database Layer](#22-database-layer)
+   - [2.3 WebSocket Layer](#23-websocket-layer)
+   - [2.4 External IGDB Integration](#24-external-igdb-integration)
+   - [2.5 Authentication Architecture](#25-authentication-architecture)
+   - [2.6 Cross-Origin & Deployment Architecture](#26-cross-origin--deployment-architecture)
+   - [2.7 System Topology Diagram](#27-system-topology-diagram)
+3. [Deployment Topology](#3-deployment-topology)
+4. [Previously Identified Security Fixes](#4-previously-identified-security-fixes)
+5. [Authentication & Session Security](#5-authentication--session-security)
+6. [IGDB Integration Audit](#6-igdb-integration-audit)
+7. [API Route Inventory](#7-api-route-inventory)
+8. [Database & Prisma Audit](#8-database--prisma-audit)
+9. [Render WebSocket Server Audit](#9-render-websocket-server-audit)
+10. [Realtime Notification Architecture](#10-realtime-notification-architecture)
+11. [WebSocket Ticket Handshake](#11-websocket-ticket-handshake)
+12. [Environment Variables Audit](#12-environment-variables-audit)
+13. [Vercel Production Readiness](#13-vercel-production-readiness)
+14. [Render Production Readiness](#14-render-production-readiness)
+15. [Frontend Functional Audit](#15-frontend-functional-audit)
+16. [Mock Data & Incomplete UI Audit](#16-mock-data--incomplete-ui-audit)
+17. [Security Audit](#17-security-audit)
+18. [Performance & Scalability Audit](#18-performance--scalability-audit)
+19. [Error Handling & Reliability](#19-error-handling--reliability)
+20. [Testing & Verification](#20-testing--verification)
+21. [Current Implementation Matrix](#21-current-implementation-matrix)
+22. [Remaining Work](#22-remaining-work)
+    - [P0 — Must Fix Before Beta](#p0--must-fix-before-beta)
+    - [P1 — Should Fix During Beta Preparation](#p1--should-fix-during-beta-preparation)
+    - [P2 — Post-Beta / Scale Improvements](#p2--post-beta--scale-improvements)
+23. [Beta Launch Checklist](#23-beta-launch-checklist)
+24. [Recommended Beta Testing Protocol](#24-recommended-beta-testing-protocol)
+25. [Known Non-Blockers](#25-known-non-blockers)
+26. [Post-Beta Roadmap](#26-post-beta-roadmap)
+27. [Final Beta Readiness Assessment](#27-final-beta-readiness-assessment)
+28. [Appendix — Important Files](#28-appendix--important-files)
 
 ---
 
-## Executive Summary & System Topology
+## 1. Executive Summary
 
-GGLOG is an ambitious, high-fidelity social gaming archive modeled on the core user engagement mechanics of **Letterboxd**: users discover video games, log gameplay sessions, rate and review titles, maintain backlogs/watchlists, curate custom game lists, follow other gamers, and consume a personalized activity feed.
+### 1.1 Project Overview
+GGLOG is a retro-futuristic social gaming diary and community platform inspired by Letterboxd. It enables players to catalog gaming experiences, assign star ratings, compose detailed reviews, curate personal game histories, follow other gamers, engage via likes and comments, and receive instant realtime notifications.
 
-### Hybrid Production Deployment Topology
+### 1.2 Current Architecture & Topology
+The application relies on a dual-host production deployment:
+- **Web & API Host (Vercel):** Runs Next.js 16 (App Router) with React 19 and TypeScript. Hosts the frontend user interface and 26 serverless API endpoints.
+- **Database (Neon PostgreSQL):** Pooled serverless PostgreSQL accessed via Prisma ORM 7.9.1 using `@prisma/adapter-neon`.
+- **Realtime Service (Render):** A dedicated Node.js WebSocket server (`server/ws.ts`) that manages active browser sockets and connects to the same Neon database to poll for and broadcast notifications.
+- **Game Metadata (Twitch OAuth2 + IGDB v4):** Server-side integration authenticating via Twitch Client Credentials to query IGDB metadata and cache global game entities into Neon.
 
-The system is architected across a distributed, multi-cloud topology:
-1. **Frontend & Serverless API Tier:** Next.js 16 (React 19) deployed to **Vercel**. Serves React Server Components, client bundles, and serverless Node.js API routes (`app/api/*`).
-2. **Relational Database Tier:** PostgreSQL hosted on **Neon Serverless Postgres**, connected via Prisma ORM 7.9.1 utilizing the `@prisma/adapter-neon` connection pooler adapter.
-3. **Realtime WebSocket Tier:** A dedicated standalone Node.js process (`server/ws.ts`) targeted for persistent hosting on **Render**, bridging realtime notifications to browser clients via short-lived authentication tickets (`WsTicket`) and database polling.
-4. **External Game Metadata Provider:** Twitch / IGDB v4 API for global game catalog discovery, normalized and cached on write into PostgreSQL.
+### 1.3 Overall Beta Readiness
+GGLOG is **Nearly Ready** for a controlled 3–5 user beta launch. The core database schema, data relationships, transactional logging pipeline, Twitch OAuth integration, password hashing, and cross-origin WebSocket ticket handshakes are fully built and verified in the current code.
 
-### Architecture Topology Diagram
+### 1.4 Production-Grade Systems (Verified)
+- **User Authentication:** Bcrypt password hashing (12 salt rounds), HttpOnly/SameSite session cookies, and session invalidation upon logout.
+- **Twitch/IGDB OAuth2 Pipeline:** Automatic token acquisition, 5-minute safety buffers, in-flight stampede protection, and automatic 401 retry recovery. Static bearer tokens have been completely eliminated.
+- **Core Game Logging:** Transactional creation of `LogEntry`, `Review`, and `Activity` records linked to globally deduplicated `Game` records.
+- **Social Graph & Engagements:** Directed follow/unfollow graph, review likes with composite primary key idempotency, threaded comments, and user search.
+- **Realtime Infrastructure:** Cross-origin WebSocket authentication via single-use 60-second tickets (`WsTicket`), sequential database polling, batching, and keepalive pings.
+- **Compilation & Bundling:** `npx tsc --noEmit` exits with 0 errors; `next build` compiles successfully with Turbopack in 24.4s.
 
-```
-                               ┌──────────────────────────────────────────────────────────┐
-                               │                    CLIENT BROWSER                        │
-                               │        Next.js React 19 Frontend (CSR + SSR)             │
-                               │        NotificationProvider + AuthContext                │
-                               └──────────────┬────────────────────────────▲──────────────┘
-                                              │                            │
-                     HTTPS / Same-Origin      │                            │  WSS / Cross-Origin
-                     Cookie: gglog_session    │                            │  ?ticket=<WsTicket>
-                                              ▼                            │
-                       ┌──────────────────────────────┐                    │
-                       │        VERCEL (EDGE)         │                    │
-                       │     Next.js Middleware       │                    │
-                       │    (Fast Cookie Check)       │                    │
-                       └──────────────┬───────────────┘                    │
-                                      │                                    │
-                                      ▼                                    │
-                       ┌──────────────────────────────┐                    │
-                       │      VERCEL SERVERLESS       │                    │
-                       │    API Route Handlers        │                    │
-                       │   lib/auth.ts (SHA-256)      │                    │
-                       │   lib/services/*             │                    │
-                       └──────┬───────────────┬───────┘                    │
-                              │               │                            │
-             Cache miss on log│               │ Auth, CRUD & Tickets       │
-                              ▼               ▼                            │
-                     ┌────────────────┐ ┌───────────────────────────┐      │
-                     │  TWITCH / IGDB │ │   NEON SERVERLESS PG      │      │
-                     │   v4 API       │ │   (Pooled PostgreSQL)     │      │
-                     │ (Static Token!)│ └─────────────▲─────────────┘      │
-                     └────────────────┘               │                    │
-                                                      │ Polls unread       │
-                                                      │ every 2000ms       │
-                                                      ▼                    │
-                                        ┌───────────────────────────┐      │
-                                        │      RENDER WEBSOCKET     │      │
-                                        │      (Persistent Node)    │──────┘
-                                        │       server/ws.ts        │
-                                        └───────────────────────────┘
-```
+### 1.5 Genuine Blockers Remaining for 3–5 User Beta
+Only **three blockers** must be addressed before beta deployment:
+1. **ESLint Build Risk:** `npm run lint` fails with exit code 1 because `eslint.config.mjs` does not ignore `src/generated/**` (the Prisma Client generated files), combined with 39 JSX comment syntax errors in application components. If Vercel enforces linting during the build, deployment will be rejected.
+2. **Missing Build Automation:** `package.json` lacks `"postinstall": "prisma generate"`, creating a critical deployment risk where the Prisma Client is not automatically generated in fresh cloud container environments.
+3. **Frontend Dead Links & Mock Data:**
+   - In `components/discover/ReviewCard.tsx`, clicking `[ READ ]` routes to `/dashboard/diary`, which does not exist in the routing tree (triggers a 404).
+   - In `app/dashboard/page.tsx`, the profile header and side statistics panel render hardcoded mock constants (`MOCK_PROFILE_STATS`, `MOCK_PLAYER_STATS`) rather than the authenticated user's actual database record.
 
-### High-Level Architectural Verdict
-While core relational modeling, authentication mechanics, cursor pagination abstractions, and social graph primitives demonstrate solid design patterns, **the codebase is currently NOT production-ready**. Critical blockers include:
-- A static Twitch IGDB access token that will expire and crash search and logging.
-- A 2000ms database polling loop in the WebSocket server lacking an index on `createdAt`, causing continuous table scans on Neon serverless PostgreSQL.
-- Heavy mock data contamination on the primary `/dashboard` route.
-- Orphaned service modules (`List` and `Watchlist` backend services are fully written but have zero API routes or UI).
-- Inconsistencies and broken routes in client navigation.
+### 1.6 Deferred Post-Beta Scope
+- Distributed Redis rate limiting (in-memory rate limiting is completely sufficient for 3–5 beta users).
+- Watchlist and Curated Lists subsystems (backend services exist, but API/UI can wait for a later release).
+- Social feed query optimizations and materialized database feeds.
+- Automated end-to-end testing suites (Playwright/Cypress).
 
 ---
 
-## Section 1 — High-Level Architecture & Repository Organization
+## 2. System Architecture
 
-The repository follows Next.js 16 App Router conventions with a clean separation of presentation, API routes, domain services, database schemas, and external server processes.
+### 2.1 Frontend / API Layer
+- **Framework:** Next.js 16.3.0 with React 19.2.8 and TypeScript 5.
+- **Routing:** App Router located in `app/`. Client components use `"use client"` and React hooks for local state and optimistic UI updates.
+- **API Runtime:** Next.js Serverless Route Handlers (`app/api/**/route.ts`). Responses are strictly normalized via `lib/errors.ts` returning standard envelopes: `{ success: true, data: ... }` or `{ success: false, error: { code, message } }`.
+- **Validation:** Zod schemas in `lib/validations/` enforce payload structure, data types, and character limits across all mutations.
 
-### Directory Structure & Responsibilities
+### 2.2 Database Layer
+- **Engine:** Neon Serverless PostgreSQL.
+- **ORM:** Prisma Client 7.9.1 configured with `@prisma/adapter-neon` in `lib/db.ts` to allow connection pooling over HTTP/WebSockets.
+- **Connection Model:**
+  - `DATABASE_URL`: Pooled connection string used by Next.js serverless functions and the Render WebSocket server.
+  - `DIRECT_URL`: Direct unpooled connection string used exclusively by Prisma CLI (`prisma.config.ts`) for running migrations.
+
+### 2.3 WebSocket Layer
+- **File:** `server/ws.ts`.
+- **Process Model:** Standalone, persistent Node.js HTTP + WebSocket server (`ws` library).
+- **Authentication:** Ticket-based handshake for cross-origin deployment; fallback to cookie parsing for local development.
+- **Database Bridge:** Because Vercel serverless functions cannot communicate via in-memory events with Render, `server/ws.ts` executes a sequential polling loop querying Neon for new `Notification` rows directed at connected users.
+
+### 2.4 External IGDB Integration
+- **Directory:** `lib/idgb/`.
+- **Authentication:** `lib/idgb/auth.ts` communicates directly with Twitch OAuth2 (`https://id.twitch.tv/oauth2/token`) using the `client_credentials` grant.
+- **Caching:** Obtained access tokens are stored in server memory alongside an expiration timestamp calculated as `Date.now() + (expires_in * 1000) - 300000` (5-minute safety buffer).
+- **Client:** `lib/idgb/client.ts` centralizes Apicalypse POST requests to `https://api.igdb.com/v4`.
+
+### 2.5 Authentication Architecture
+- **Mechanism:** Native custom session authentication (zero third-party auth vendors).
+- **Password Security:** Salted and hashed using `bcryptjs` with 12 rounds in `app/api/auth/signup/route.ts`.
+- **Session Model:** Upon login, a cryptographically random UUID token (`crypto.randomUUID()`) is generated, stored in the `Session` table with a 30-day expiry, and issued to the client via an `HttpOnly`, `SameSite=Lax` cookie named `gglog_session`.
+- **Protection Guard:** Server-side `requireAuth()` helper verifies the cookie against Neon. Client-side `ProtectedRoute.tsx` prevents rendering and redirects unauthenticated users to `/auth`.
+
+### 2.6 Cross-Origin & Deployment Architecture
+- **Client Domain:** Hosted on Vercel (`https://<project>.vercel.app`).
+- **Realtime Domain:** Hosted on Render (`https://<service>.onrender.com` / `wss://...`).
+- **CORS & Origin Filtering:** `server/ws.ts` inspects the HTTP `Origin` header during the WebSocket upgrade request. It permits connection only if the origin is explicitly listed in `WS_ALLOWED_ORIGINS`.
+
+### 2.7 System Topology Diagram
 
 ```
-d:/gglog/gglog
-├── app/                              # Next.js 16 App Router (Pages & Serverless API Routes)
-│   ├── api/                          # Next.js Serverless Route Handlers
-│   │   ├── activity/feed/            # Activity feed endpoint
-│   │   ├── auth/                     # Signup, signin, logout, me, ws-ticket
-│   │   ├── comments/                 # Comment deletion endpoint
-│   │   ├── diary/                    # Personal game diary endpoint
-│   │   ├── feed/                     # Duplicate feed endpoint
-│   │   ├── games/                    # IGDB search and game logging endpoints
-│   │   ├── notifications/            # Notification fetch, unread count, read-all, dismiss
-│   │   ├── reviews/                  # Review discovery, review CRUD, likes, comments
-│   │   └── users/                    # User profile, search, follow, followers, following
-│   ├── auth/                         # Consolidated login/signup page
-│   ├── dashboard/                    # Authenticated user dashboard & features
-│   │   ├── discover/                 # Community reviews, social feed, player discovery
-│   │   ├── log/                      # Game search and logging interface
-│   │   └── profile/[username]/       # Public/user player profile page
-│   ├── discover/                     # Public redirect / legacy discover route
-│   ├── globals.css                   # Global CSS styles and design tokens
-│   ├── layout.tsx                    # Root layout wrapping AuthProvider and NotificationProvider
-│   └── page.tsx                      # Public marketing landing page
-├── components/                       # Reusable React 19 UI Components
-│   ├── discover/                     # DiscoverHeader, ReviewCard, CommentSection, FollowingFeed, PlayerGrid
-│   ├── logging/                      # RatingSelector, StatusSelector, ReviewEditor, VisibilitySelector
-│   ├── notifications/                # NotificationBell, NotificationPanel, NotificationList, NotificationItem
-│   ├── profile/                      # ProfileHeader, ProfileTabs, DiaryTimeline, StatsPanel, FollowListModal
-│   ├── providers/                    # AuthContext, NotificationProvider, ProtectedRoute
-│   ├── search/                       # GameSearchModal
-│   ├── sections/                     # Landing page marketing sections
-│   └── ui/                           # PixelButton, GlitchText, XPBar, CountUpNumber
-├── data/                             # Mock data files & static fixtures
-│   ├── mockCollections.ts            # Mock curated game lists
-│   ├── mockDiary.ts                  # Mock diary entries
-│   └── mockProfile.ts                # Mock user statistics and profile quote
-├── lib/                              # Core Domain Logic, Services & Utilities
-│   ├── api/client.ts                 # Typed fetch wrappers (apiGet, apiPost, apiDelete, apiPatch)
-│   ├── auth.ts                       # Session management, bcrypt hashing, SHA-256 tokens, cookies
-│   ├── db.ts                         # Prisma client singleton with @prisma/adapter-neon pooling
-│   ├── idgb/                         # Twitch/IGDB API client (typo: 'idgb' instead of 'igdb')
-│   │   ├── auth.ts                   # Static token reader (lacks OAuth2 exchange)
-│   │   ├── client.ts                 # Base HTTP fetch wrapper
-│   │   └── games.ts                  # Game search and ID retrieval queries
-│   ├── notifications/                # Realtime WebSocket client and ticket exchange
-│   │   ├── notificationApi.ts        # Ticket retrieval helper
-│   │   └── notificationSocket.ts     # Client WebSocket manager with backoff reconnection
-│   ├── pagination/cursor.ts          # Generic cursor encoding, decoding, and Prisma query builder
-│   ├── permissions/visibility.ts     # Visibility permission checks (PUBLIC, FOLLOWERS, PRIVATE)
-│   └── services/                     # Pure business logic layer
-│       ├── commentService.ts         # Review comment CRUD and notifications
-│       ├── feedService.ts            # Follower-based activity feed builder
-│       ├── followService.ts          # Follow graph, idempotent toggles, activity generation
-│       ├── gameService.ts            # Cache-on-write game upsert and logging transactions
-│       ├── listService.ts            # Curated list management (Orphaned: 0 API routes)
-│       ├── notificationService.ts    # Notification persistence and trigger helpers
-│       ├── reviewLikeService.ts      # Review like/unlike and notifications
-│       ├── reviewService.ts          # Review CRUD, rating aggregations, visibility filters
-│       ├── userService.ts            # Profile retrieval, user search, profile updates
-│       └── watchlistService.ts       # Watchlist/backlog management (Orphaned: 0 API routes)
-├── prisma/                           # Database Schema & Migrations
-│   ├── migrations/                   # SQL migration history
-│   └── schema.prisma                 # 14 models, 4 enums, output to src/generated/prisma
-└── server/                           # Standalone Realtime Server
-    └── ws.ts                         # Node.js WebSocket server for Render deployment
++-------------------------------------------------------------------------------+
+|                                    BROWSER                                    |
+|                                                                               |
+|  - React 19 Frontend Components (/dashboard, /auth, /discover)                |
+|  - AuthContext (Session state via HttpOnly 'gglog_session' cookie)            |
+|  - notificationSocket.ts (WebSocket Client with exponential reconnect)        |
++-------------------+---------------------------------------+-------------------+
+                    |                                       |
+     HTTPS Requests |                       WSS Connections |
+     + Cookie Auth  |                       + ?ticket=TOKEN |
+                    v                                       v
++---------------------------------------+   +-----------------------------------+
+|            VERCEL RUNTIME             |   |           RENDER HOST             |
+|          (Next.js App Router)         |   |      (Standalone Node Process)    |
+|                                       |   |                                   |
+|  - Serverless API Routes (26 routes)  |   |  - server/ws.ts                   |
+|  - Process-local Rate Limiter (Map)   |   |  - Health Endpoint (/health)      |
+|  - POST /api/auth/ws-ticket           |   |  - Connection Manager             |
+|  - Twitch Token Cache (In-Memory)     |   |  - Sequential DB Polling Loop     |
++---------+--------------------+--------+   +-----------------+-----------------+
+          |                    |                              |
+          | HTTP POST          | SQL Queries                  | SQL Poll Queries
+          | (client_creds)     | (Pooled Connection)          | (Pooled Connection)
+          v                    v                              v
++-------------------+   +-------------------------------------------------------+
+|  TWITCH / IGDB    |   |                    NEON POSTGRESQL                    |
+|                   |   |                                                       |
+| - Twitch OAuth2   |   |  - User, Profile, Session                             |
+|   (Token Service) |   |  - Game, Genre, Platform                              |
+| - IGDB v4 API     |   |  - LogEntry, Review, ReviewLike, Comment              |
+|   (Apicalypse)    |   |  - Follow (Social Graph)                              |
+|                   |   |  - WsTicket (Short-lived, single-use auth tokens)     |
+|                   |   |  - Notification (Indexed by userId & createdAt)       |
++-------------------+   +-------------------------------------------------------+
 ```
 
 ---
 
-## Section 2 — Request / Response Lifecycle & Communication Patterns
+## 3. Deployment Topology
 
-### Standard Client-to-Serverless Request Flow
-A typical user interaction follows a clean multi-layer pipeline:
-1. **Trigger:** A React Client Component (e.g., [components/discover/ReviewCard.tsx](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx)) executes an action like toggling a like.
-2. **Client API Helper:** Calls `apiPost('/api/reviews/' + reviewId + '/like')` in [lib/api/client.ts](file:///d:/gglog/gglog/lib/api/client.ts), passing credentials via `credentials: 'include'`.
-3. **Route Handler:** Reached at [app/api/reviews/[reviewId]/like/route.ts](file:///d:/gglog/gglog/app/api/reviews/%5BreviewId%5D/like/route.ts).
-4. **Authentication & Identity:** The route executes `requireAuth()` ([lib/auth.ts](file:///d:/gglog/gglog/lib/auth.ts#L67-L91)), which reads the `gglog_session` cookie, computes its SHA-256 hash, and verifies it against the `Session` table in Neon PostgreSQL. If invalid or expired, a 401 Unauthorized is immediately returned.
-5. **Business Logic Delegation:** The handler invokes `likeReview(user.id, reviewId)` in [lib/services/reviewLikeService.ts](file:///d:/gglog/gglog/lib/services/reviewLikeService.ts).
-6. **Data Persistence & Side Effects:** `reviewLikeService` creates a `ReviewLike` record, increments aggregate counters, records an `Activity` record, and calls `notificationService.createNotification()` to insert a notification row for the review author.
-7. **Serialization & State Update:** The API returns `{ success: true, liked: true, likeCount: number }`. The client updates local React state optimistically or on response resolution.
+### 3.1 Vercel
+- **Responsibilities:** Next.js static asset delivery, App Router SSR/client rendering, serverless API execution, user registration, user authentication, ticket generation, game search proxying, game logging transactions, and social graph endpoints.
+- **Scaling Characteristics:** Ephemeral, stateless serverless lambda instances. Memory is not shared across parallel lambda invocations.
 
-### Cross-Domain Realtime Ticket Handshake Flow
-Because Next.js runs on Vercel (serverless edge/lambda) and the WebSocket server runs on Render (persistent Node process), in-memory process sharing is impossible. Realtime connection establishment uses a secure ticket handshake:
+### 3.2 Render
+- **Responsibilities:** Dedicated, long-running Node.js process hosting `server/ws.ts`. Manages active client WebSockets, executes the keepalive ping loop, validates incoming tickets, executes the sequential database notification poll loop, and fans out realtime notifications.
+- **Scaling Characteristics:** Single persistent instance. Keeps active socket descriptors open in memory.
 
-```
-Browser                 Vercel API Handler             Neon PostgreSQL            Render WebSocket
-   │                            │                              │                         │
-   │─── POST /api/auth/ws-ticket ─▶│                              │                         │
-   │    (gglog_session cookie)  │                              │                         │
-   │                            │─── Hash session & verify ───▶│                         │
-   │                            │◀── Session valid ────────────│                         │
-   │                            │                              │                         │
-   │                            │─── INSERT WsTicket ─────────▶│                         │
-   │                            │    (token, userId, 60s exp)  │                         │
-   │◀── { ticket: string } ─────│                              │                         │
-   │                                                           │                         │
-   │─── WSS CONNECT wss://gglog-ws.onrender.com?ticket=TOKEN ───────────────────────────▶│
-   │                                                           │                         │
-   │                                                           │◀── SELECT WsTicket ─────│
-   │                                                           │─── Return ticket ──────▶│
-   │                                                           │                         │
-   │                                                           │◀── UPDATE used = true ──│
-   │◀── WebSocket Connection Accepted (bind userId) ─────────────────────────────────────│
-```
+### 3.3 Neon PostgreSQL
+- **Responsibilities:** Central persistent relational datastore for all application data, user accounts, sessions, social relations, cached IGDB entities, notification events, and ephemeral WebSocket tickets.
+- **Scaling Characteristics:** Serverless PostgreSQL with autoscaling storage and compute. PgBouncer pooling endpoint handles connection spikes from serverless functions.
 
-### API Response Structure Inconsistencies
-The audit uncovered schema inconsistencies across API route responses:
-- Some cursor-paginated endpoints return `{ data: [...], nextCursor: string | null, hasMore: boolean }` (e.g., `/api/users/[username]/followers`).
-- Other endpoints return `{ reviews: [...], nextCursor: string | null }` without the `hasMore` boolean (e.g., `/api/reviews/discover`).
-- Feed endpoints return `{ data: [...], nextCursor: ... }` while user search returns `{ users: [...] }`.
-- These variations force client components to implement ad-hoc response parsers rather than a unified pagination hook.
+### 3.4 Twitch Developer Portal & IGDB
+- **Responsibilities:** Authoritative external game metadata source.
+- **Scaling Characteristics:** Governed by Twitch OAuth token rate limits and IGDB Apicalypse request quotas (standard tier: 4 requests per second).
 
 ---
 
-## Section 3 — Authentication, Session Management & Cookie Security
+## 4. Previously Identified Security Fixes
 
-Authentication is implemented natively in [lib/auth.ts](file:///d:/gglog/gglog/lib/auth.ts) without third-party auth vendors (NextAuth, Supabase, Clerk).
-
-### 1. User Registration & Password Hashing
-- **Endpoint:** [app/api/auth/signup/route.ts](file:///d:/gglog/gglog/app/api/auth/signup/route.ts)
-- **Hashing:** Passwords are hashed using `bcryptjs` with a cost factor of **12 salt rounds** (`bcrypt.hash(password, 12)`).
-- **Transaction:** The user and their associated `Profile` row are created atomically in a Prisma `$transaction`.
-- **Validation:** Enforces minimum 8 characters, username uniqueness, and valid email format.
-
-### 2. Session Creation & Token Security
-- **Token Generation:** When a user logs in or registers, `crypto.randomBytes(32).toString('hex')` generates a 64-character cryptographically secure token.
-- **Database Storage:** The plain token is **never stored in the database**. A SHA-256 hash is computed (`crypto.createHash('sha256').update(rawToken).digest('hex')`) and saved to the `Session` table with a 30-day lifetime (`expiresAt: now + 30 days`).
-- **Database Defense:** If the database is compromised, active session tokens cannot be extracted to hijack sessions.
-
-### 3. Cookie Storage & Security Flags
-- **Cookie Name:** `gglog_session`
-- **Flags:**
-  - `httpOnly: true` (prevents client-side XSS access via `document.cookie`).
-  - `secure: process.env.NODE_ENV === 'production'` (transmitted solely over HTTPS in production).
-  - `sameSite: 'lax'` (provides standard CSRF protection for top-level navigations).
-  - `path: '/'` (scoped to entire domain).
-  - `maxAge: 30 * 24 * 60 * 60` (30 days).
-
-### 4. API Request Authentication
-- Handlers call `requireAuth()` or `getSession()`.
-- `getSession()` retrieves the cookie via `next/headers`, computes SHA-256, and queries:
-  ```ts
-  await prisma.session.findUnique({
-    where: { token: hashedToken },
-    include: { user: { include: { profile: true } } }
-  });
-  ```
-- If found but `expiresAt < now`, the expired session is deleted asynchronously and `null` is returned.
-
-### 5. Frontend Authentication & Protected Routes
-- **Client Auth Provider:** [components/providers/AuthContext.tsx](file:///d:/gglog/gglog/components/providers/AuthContext.tsx) executes `GET /api/auth/me` on mount, storing user and profile state in React context.
-- **Route Guarding:** [components/providers/ProtectedRoute.tsx](file:///d:/gglog/gglog/components/providers/ProtectedRoute.tsx) wraps protected pages. If `!loading && !user`, it redirects to `/auth?redirect=` with the target pathname.
-- **Edge Middleware:** `middleware.ts` provides fast edge-level redirect protection if `gglog_session` cookie is missing.
-
-### 6. Identified Security Weaknesses in Authentication
-1. **Zero Rate Limiting on Login/Signup:** `/api/auth/signin` and `/api/auth/signup` lack rate limiting or IP-based throttling. Vulnerable to automated credential stuffing and dictionary attacks.
-2. **Unused OAuth Schema:** `model Account` exists in `schema.prisma` for Google OAuth, but zero OAuth route handlers or provider integrations exist in the application.
+| # | Finding | Previous Risk | Current Implementation | Status | Repository Evidence |
+|---|---|---|---|:---:|---|
+| 1 | Static IGDB Bearer Token | Static token expired after ~60 days, breaking game search and logging globally. | Replaced with dynamic Twitch OAuth2 Client Credentials flow. | 🟢 Verified / Fixed | `lib/idgb/auth.ts:69-102` |
+| 2 | IGDB Token Expiration | Expired tokens caused 401 request failures in production. | Tokens cached in-memory with a 5-minute pre-expiration buffer. | 🟢 Verified / Fixed | `lib/idgb/auth.ts:15,94` |
+| 3 | IGDB Token Stampede | Concurrent queries during expiration triggered parallel Twitch token requests. | Implemented `inflightRequest` promise sharing across simultaneous callers. | 🟢 Verified / Fixed | `lib/idgb/auth.ts:43,121-136` |
+| 4 | IGDB 401 Self-Recovery | Premature token invalidation left the application unable to recover automatically. | Central client intercepts 401s, invalidates cache, refreshes token, and retries once. | 🟢 Verified / Fixed | `lib/idgb/client.ts:41-65` |
+| 5 | Authentication Rate Limiting | Vulnerable to automated credential stuffing and signup spam. | Process-local fixed-window rate limiting on `/signin` (10/15m) and `/signup` (5/1h). | 🟢 Verified / Fixed | `app/api/auth/signin/route.ts:13-15`, `app/api/auth/signup/route.ts:16-18` |
+| 6 | Game Search Rate Limiting | Repeated debounced search typing threatened to exhaust IGDB API quotas. | Process-local rate limiting on `/api/games/search` (30/1m) with fail-open behavior. | 🟢 Verified / Fixed | `app/api/games/search/route.ts:19-26` |
+| 7 | Render WebSocket Polling Load | WS server polled database every 2s unconditionally, generating millions of empty queries. | Poll loop skips execution when 0 users are connected (`connectedUserCount === 0`). | 🟢 Verified / Fixed | `server/ws.ts:534-539` |
+| 8 | Notification Indexing | Polling query performed unindexed table scans on `Notification.createdAt`. | Compound index `[userId, createdAt]` and single index `[createdAt]` created. | 🟢 Verified / Fixed | `prisma/schema.prisma:365-367`, migration `20260904160000` |
+| 9 | Overlapping Poll Queries | `setInterval` spawned concurrent database queries during network/Neon latency. | Replaced with sequential `async while` loop with strict `await` before sleeping. | 🟢 Verified / Fixed | `server/ws.ts:533-540` |
+| 10 | Bounded Polling | High-volume notification spikes could exhaust Node process memory. | Added hard limit `take: 100` and ID watermark advancement to latest timestamp. | 🟢 Verified / Fixed | `server/ws.ts:487,516` |
+| 11 | Cross-Origin WS Authentication | Cookie authentication failed across different Vercel and Render domains. | Short-lived single-use ticket handshake (`WsTicket`) implemented. | 🟢 Verified / Fixed | `app/api/auth/ws-ticket/route.ts:29-48`, `server/ws.ts:189-211` |
 
 ---
 
-## Section 4 — Database Schema, Relational Integrity & Neon Performance
+## 5. Authentication & Session Security
 
-The schema is defined in [prisma/schema.prisma](file:///d:/gglog/gglog/prisma/schema.prisma) and targets PostgreSQL on Neon.
+### 5.1 Verification Status
 
-### Comprehensive Entity Model Audit
+#### Verified Secure
+- **Password Storage:** Verified in `app/api/auth/signup/route.ts:55`. Passwords are encrypted using `bcrypt.hash(password, 12)`.
+- **Session Transport:** Verified in `lib/auth.ts:17-26`. The session cookie enforces `httpOnly: true`, `sameSite: 'lax'`, `path: '/'`, and `secure: true` in production environments.
+- **Session Invalidation:** Verified in `app/api/auth/logout/route.ts:10` and `lib/auth.ts:159-173`. Logout deletes the database session record and resets the browser cookie with `maxAge: 0`.
+- **Input Validation:** Verified in `lib/validations/schemas.ts:16-48`. Usernames restricted to alphanumeric/underscore (3–30 chars), emails validated and converted to lowercase, passwords bounded (8–128 chars).
+- **IDOR Prevention:** Verified across all mutation routes. The user ID is strictly derived from `requireAuth()` session context. Client requests cannot specify arbitrary user IDs.
 
-| Model | Primary Key | Key Unique Constraints | Key Indexes | Cascade Delete Behavior | Purpose in Social System |
-|---|---|---|---|---|---|
-| **User** | `id` (cuid) | `email`, `username` | — | Cascades to Profile, Sessions, Accounts, Logs, Reviews, Likes, Comments, Follows, Notifications, Lists. | Core user identity record. |
-| **Profile** | `id` (cuid) | `userId` | — | `user` (onDelete: Cascade) | User bio, avatar, player stats, gaming DNA. |
-| **Session** | `id` (cuid) | `token` | `@@index([userId])` | `user` (onDelete: Cascade) | Hashed active session tokens. |
-| **Account** | `id` (cuid) | `@@unique([provider, providerAccountId])` | `@@index([userId])` | `user` (onDelete: Cascade) | OAuth provider links (currently unpopulated). |
-| **Game** | `id` (cuid) | `igdbId` | `@@index([name])` | — | Local cache of IGDB game metadata. |
-| **Genre** | `id` (cuid) | `name`, `igdbId` | — | Many-to-many with Game. | Normalized genres. |
-| **Platform** | `id` (cuid) | `name`, `igdbId` | — | Many-to-many with Game. | Normalized gaming platforms. |
-| **LogEntry** | `id` (cuid) | — | `@@index([userId, playedAt])` | `user` (Cascade), `game` (Cascade) | Individual play diary records. |
-| **Review** | `id` (cuid) | `logEntryId` (1:1) | `@@index([userId, createdAt])`, `@@index([gameId, createdAt])` | `user` (Cascade), `game` (Cascade), `logEntry` (Cascade) | Ratings (0.5-5.0), reviews, spoilers, visibility. |
-| **ReviewLike**| `@@id([userId, reviewId])` | — | `@@index([reviewId])` | `user` (Cascade), `review` (Cascade) | Composite PK prevents duplicate likes. |
-| **Comment** | `id` (cuid) | — | `@@index([reviewId, createdAt])` | `user` (Cascade), `review` (Cascade) | Review discussion thread items. |
-| **Follow** | `@@id([followerId, followingId])` | — | `@@index([followingId])` | `follower` (Cascade), `following` (Cascade) | Directed social graph edges. |
-| **Activity** | `id` (cuid) | — | `@@index([actorId, createdAt])` | `actor` (Cascade), `game` (Cascade) | Social timeline event stream. |
-| **Notification**| `id` (cuid) | — | `@@index([userId, createdAt])` | `user` (Cascade), `actor` (Cascade) | Direct user alerts (FOLLOW, LIKE, COMMENT). |
-| **WsTicket** | `id` (cuid) | `token` | `@@index([userId])` | `user` (Cascade) | Short-lived single-use WebSocket tickets. |
-| **WatchlistItem**| `@@id([userId, gameId])` | — | `@@index([userId, addedAt])` | `user` (Cascade), `game` (Cascade) | User backlog/watchlist entries. |
-| **List** | `id` (cuid) | — | `@@index([userId, createdAt])` | `user` (Cascade) | Curated game list containers. |
-| **ListItem** | `@@id([listId, gameId])` | — | `@@index([listId, position])` | `list` (Cascade), `game` (Cascade) | Ordered items in curated lists. |
+#### Partial Implementations
+- **Session Token Hashing:** In `lib/auth.ts:70-79`, session tokens are generated via `crypto.randomUUID()` and stored as **plain text** in `prisma.session.create({ data: { sessionToken } })`. Previous documentation claimed SHA-256 token hashing was implemented. The current code stores unhashed tokens. While random UUIDs provide 128-bit entropy (making guessing impossible), hashing tokens before database persistence is standard defense-in-depth practice.
+- **Rate Limiting Scope:** Implemented via in-memory Maps in `lib/rate-limit.ts`. On Vercel, rate limit counters are local to each serverless container. While adequate for a 3–5 user beta, this does not provide globally distributed protection.
 
-### Migration History & Schema Synchronization
-- Migrations in `prisma/migrations/` are sequential and intact:
-  - `20260228065057_init`
-  - `20260228073831_init`
-  - `20260228080000_add_ws_tickets`
-  - `20260228090000_social_layer`
-  - `20260228100000_full_schema`
-- Models `WsTicket`, `Notification`, `Follow`, `ReviewLike`, `Comment`, `WatchlistItem`, and `List` are verified present in both migrations and active schema.
-- TypeScript compilation (`npx tsc --noEmit`) exits with 0 errors, proving generated Prisma Client matches codebase calls.
+#### Remaining Concerns
+- **Missing Password Reset Route:** In `app/auth/page.tsx:208-217`, the "Forgot Password" form executes an artificial delay (`setTimeout(1500)`) and renders a fake success message (`RECOVERY LINK TRANSMITTED_`). No backend endpoint, email provider, or token reset mechanism exists.
+- **Unthrottled Ticket Issuance:** `POST /api/auth/ws-ticket` requires authentication but has no rate limiting. An authenticated user could spam this endpoint to bloat the `WsTicket` table.
 
 ---
 
-## Section 5 — Follow System & Social Graph Audit
+## 6. IGDB Integration Audit
 
-Implemented in [lib/services/followService.ts](file:///d:/gglog/gglog/lib/services/followService.ts) and exposed via [app/api/users/[username]/follow/route.ts](file:///d:/gglog/gglog/app/api/users/%5Busername%5D/follow/route.ts).
+### 6.1 Implementation Details
+- **OAuth Token Management (`lib/idgb/auth.ts`):** Client ID and Client Secret are retrieved from `process.env.TWITCH_CLIENT_ID` and `process.env.TWITCH_CLIENT_SECRET`. Tokens are requested via HTTPS POST to Twitch OAuth.
+- **Safety Buffer:** The token expiration is set to 5 minutes (300,000 ms) prior to the official Twitch TTL to avoid edge-case mid-request expiration.
+- **Concurrency Stampede Lock:** `inflightRequest: Promise<string> | null` ensures that simultaneous callers wait on a single network request.
+- **401 Recovery (`lib/idgb/client.ts`):** If IGDB responds with HTTP 401, the client calls `invalidateCachedToken()`, acquires a fresh token from Twitch, and retries the request exactly once.
+- **Data Caching (`lib/services/gameService.ts`):** `getOrCreateGame(igdbId)` queries Neon first. If missing, it fetches metadata from IGDB, persists the game record, and returns the cached entity.
 
-### Step-by-Step Lifecycle: User A Follows User B
-1. **Invocation:** User A clicks "Follow" on User B's profile or player card. `POST /api/users/[username]/follow` is called.
-2. **Self-Follow Prevention:** `followService.ts` explicitly checks:
+### 6.2 Vulnerabilities & Defects Established
+1. **Apicalypse Query Injection / Syntax Breakdown:**
+   In `lib/idgb/games.ts:87`:
    ```ts
-   if (followerId === targetUser.id) {
-     throw new Error("You cannot follow yourself");
-   }
+   search "${search}";
    ```
-   Returns HTTP 400 with a descriptive error message.
-3. **Duplicate Follow Prevention:** Database composite primary key `@@id([followerId, followingId])` physically rejects duplicate edges. `followService` uses an idempotent upsert/check pattern.
-4. **Transactional Execution:**
-   - Creates the `Follow` record.
-   - Creates an `Activity` record (`type: 'FOLLOWED_USER'`, `actorId: User A`).
-   - Dispatches a notification via `notificationService.createNotification({ userId: User B.id, actorId: User A.id, type: 'FOLLOW' })`.
-5. **Unfollow Mechanics:** `DELETE /api/users/[username]/follow` removes the `Follow` record and cleanly deletes associated notifications and activities.
-6. **Follower / Following Lists & Pagination:**
-   - `GET /api/users/[username]/followers` and `GET /api/users/[username]/following`.
-   - Uses cursor pagination via `cursor.ts` sorting by `createdAt: desc`.
-   - Returns follower count, following count, and whether the viewer is currently following each user in the returned list.
-7. **Frontend State & Optimistic UI:** [components/profile/ProfileHeader.tsx](file:///d:/gglog/gglog/components/profile/ProfileHeader.tsx) and [components/discover/PlayerCard.tsx](file:///d:/gglog/gglog/components/discover/PlayerCard.tsx) update the follow button optimistically, reverting on network failure.
+   The `search` string is interpolated directly into the query string without escaping double quotes. If a user inputs quotes (e.g., `Call of Duty: Modern "Warfare"`), IGDB responds with HTTP 400 Bad Request, causing an internal server error on the frontend.
+2. **Exposed Test Endpoint:**
+   `app/api/test-igdb/route.ts` is an unauthenticated test route that directly queries IGDB for `"elden ring"`. It was not removed after initial development and exposes external API quota to public invocation.
 
 ---
 
-## Section 6 — Review & Rating Subsystem Audit
+## 7. API Route Inventory
 
-Implemented in [lib/services/reviewService.ts](file:///d:/gglog/gglog/lib/services/reviewService.ts) and [app/api/reviews/*](file:///d:/gglog/gglog/app/api/reviews).
+The repository contains **26 route files** defining **29 HTTP operations**:
 
-### Features & Implementation State
-- **Review Creation:** Occurs during game logging (`POST /api/games/log`). A review is linked 1:1 to a `LogEntry` and accepts a star rating (0.5 to 5.0 in 0.5 increments), text content, spoiler flag (`hasSpoilers`), and visibility level.
-- **Visibility System:** Enforces `Visibility` enum (`PUBLIC`, `FOLLOWERS`, `PRIVATE`) using [lib/permissions/visibility.ts](file:///d:/gglog/gglog/lib/permissions/visibility.ts):
-  - `PUBLIC`: Visible to all authenticated and anonymous viewers.
-  - `FOLLOWERS`: Visible only if the viewer follows the review author.
-  - `PRIVATE`: Visible strictly to the review author.
-- **Discover Feed:** `GET /api/reviews/discover` serves public reviews with game metadata, author profiles, like counts, and comment counts using cursor pagination.
-- **Critical UI Defect (Missing Star Display):** In [components/discover/ReviewCard.tsx](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx#L28-L41), the helper component `StarDisplay` is defined but **omitted from the JSX return statement**. The review displays text content and likes, but the star rating is visually absent.
-
----
-
-## Section 7 — Social Likes Subsystem Audit
-
-Implemented in [lib/services/reviewLikeService.ts](file:///d:/gglog/gglog/lib/services/reviewLikeService.ts) and exposed via [app/api/reviews/[reviewId]/like/route.ts](file:///d:/gglog/gglog/app/api/reviews/%5BreviewId%5D/like/route.ts).
-
-### Features & Mechanics
-- **Idempotency & Duplicate Protection:** Uses composite primary key `@@id([userId, reviewId])`. Calling `POST` when already liked returns success without error.
-- **Unlike Action:** `DELETE /api/reviews/[reviewId]/like` cleanly removes the row and decrements like count.
-- **Self-Like Notification Guard:** If a user likes their own review, the like is stored, but `notificationService` suppresses notification generation to prevent self-notification spam.
-- **Optimistic UI:** [components/discover/ReviewCard.tsx](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx) toggles the heart icon and increments/decrements the count instantly in React state.
-
----
-
-## Section 8 — Comment Subsystem Audit
-
-Implemented in [lib/services/commentService.ts](file:///d:/gglog/gglog/lib/services/commentService.ts) and exposed via:
-- `GET /api/reviews/[reviewId]/comments`
-- `POST /api/reviews/[reviewId]/comments`
-- `DELETE /api/comments/[commentId]`
-
-### Verification & Mechanics
-- **Comment Creation:** `POST` validates text body (1-2000 characters). Automatically creates a `Notification` row (`type: 'REVIEW_COMMENT'`) directed to the review author (suppressed if commenting on one's own review).
-- **Authorization & Ownership on Deletion:** `DELETE /api/comments/[commentId]` checks:
-  ```ts
-  if (comment.userId !== viewerId && comment.review.userId !== viewerId) {
-    throw new Error("Unauthorized to delete this comment");
-  }
-  ```
-  Both the comment author AND the review owner have moderation authority to delete comments.
-- **UI Integration:** [components/discover/CommentSection.tsx](file:///d:/gglog/gglog/components/discover/CommentSection.tsx) provides an interactive slide-down comment drawer under `ReviewCard`.
+| Route | Method | Purpose | Auth Required | Rate Limited | Database Ops | External Calls | Status |
+|---|:---:|---|:---:|:---:|---|---|:---:|
+| `/api/auth/signup` | POST | User registration & session creation | No | Yes (5/hr) | `User.findUnique`, `User.create`, `Session.create` | None | 🟢 Complete |
+| `/api/auth/signin` | POST | User login & session creation | No | Yes (10/15m) | `User.findFirst`, `Session.create` | None | 🟢 Complete |
+| `/api/auth/logout` | POST | Clear user session & cookie | No | No | `Session.deleteMany` | None | 🟢 Complete |
+| `/api/auth/me` | GET | Current session user check | Yes | No | `Session.findUnique` | None | 🟢 Complete |
+| `/api/auth/ws-ticket` | POST | Issue 60s single-use WS ticket | Yes | No | `WsTicket.create` | None | 🟠 Needs Rate Limit |
+| `/api/games/search` | GET | Search IGDB for games | No | Yes (30/1m) | None | IGDB v4 | 🟠 Needs Query Escape |
+| `/api/games/log` | POST | Log game play, rating, review | Yes | No | `Game.create`, `$transaction(LogEntry, Review, Activity)` | IGDB v4 (if uncached) | 🟠 Concurrency Risk |
+| `/api/diary` | GET | Paginated diary log entries | Yes | No | `LogEntry.findMany`, `count` | None | 🟢 Complete |
+| `/api/feed` | GET | Followed users activity feed | Yes | No | `Follow.findMany`, `Activity.findMany` | None | 🟠 Duplicate Route |
+| `/api/activity/feed` | GET | Followed users activity feed | Yes | No | `Follow.findMany`, `Activity.findMany` | None | 🟠 Duplicate Route |
+| `/api/reviews/discover` | GET | Public community review feed | Yes | No | `Review.findMany`, `ReviewLike.findMany` | None | 🟢 Complete |
+| `/api/reviews/[reviewId]` | GET | Single review details & visibility | Optional | No | `Review.findUnique`, `ReviewLike.findUnique` | None | 🟢 Complete |
+| `/api/reviews/[reviewId]/like` | POST | Like a review | Yes | No | `Review.findUnique`, `ReviewLike.create`, `Notification.create` | None | 🟢 Complete |
+| `/api/reviews/[reviewId]/like` | DELETE | Unlike a review | Yes | No | `ReviewLike.deleteMany` | None | 🟢 Complete |
+| `/api/reviews/[reviewId]/comments` | GET | Chronological review comments | Optional | No | `Review.findUnique`, `Comment.findMany` | None | 🟢 Complete |
+| `/api/reviews/[reviewId]/comments` | POST | Create comment on review | Yes | No | `Review.findUnique`, `Comment.create`, `Notification.create` | None | 🟢 Complete |
+| `/api/comments/[commentId]` | DELETE | Delete own comment | Yes | No | `Comment.findUnique`, `Comment.delete` | None | 🟢 Complete |
+| `/api/users/[username]` | GET | Public profile & aggregate stats | Optional | No | `User.findUnique`, `Follow.findUnique` | None | 🟢 Complete |
+| `/api/users/[username]/follow` | POST | Follow user (no self-follow) | Yes | No | `User.findUnique`, `$transaction(Follow, Activity)`, `Notification.create` | None | 🟢 Complete |
+| `/api/users/[username]/follow` | DELETE | Unfollow user | Yes | No | `Follow.deleteMany` | None | 🟢 Complete |
+| `/api/users/[username]/followers` | GET | Paginated followers list | Optional | No | `User.findUnique`, `Follow.findMany` | None | 🟢 Complete |
+| `/api/users/[username]/following` | GET | Paginated following list | Optional | No | `User.findUnique`, `Follow.findMany` | None | 🟢 Complete |
+| `/api/users/search` | GET | Search users by username/name | Yes | No | `User.findMany`, `Follow.findMany` | None | 🟢 Complete |
+| `/api/notifications` | GET | Paginated notifications | Yes | No | `Notification.findMany` | None | 🟢 Complete |
+| `/api/notifications/unread-count` | GET | Lightweight unread count | Yes | No | `Notification.count` | None | 🟢 Complete |
+| `/api/notifications/read-all` | PATCH | Mark all notifications read | Yes | No | `Notification.updateMany` | None | 🟢 Complete |
+| `/api/notifications/[id]/read` | PATCH | Mark single notification read | Yes | No | `Notification.updateMany` | None | 🟢 Complete |
+| `/api/notifications/[id]` | DELETE | Dismiss notification | Yes | No | `Notification.deleteMany` | None | 🟢 Complete |
+| `/api/test-igdb` | GET | Hardcoded debug query | No | No | None | IGDB v4 | 🔴 Remove (Debug) |
 
 ---
 
-## Section 9 — Discover Page & Subcomponents Audit
+## 8. Database & Prisma Audit
 
-Located at [app/dashboard/discover/page.tsx](file:///d:/gglog/gglog/app/dashboard/discover/page.tsx).
+### 8.1 Configuration & Client Architecture
+- **Prisma Version:** `7.9.1` with engine type client library.
+- **Neon Adapter:** Instantiated in `lib/db.ts:11-16` using `@prisma/adapter-neon` with `process.env.DATABASE_URL`.
+- **Global Singleton:** Managed via `globalThis` in `lib/db.ts:18-22` to prevent connection leaks during Next.js hot module reloads in development.
+- **Client Output:** Generated into `src/generated/prisma`.
 
-### Route & Component Analysis
-- **Route Guarding:** Fully wrapped in `<ProtectedRoute>`. Unauthenticated visitors are redirected to login.
-- **Legacy Route:** `/discover/page.tsx` exists as an unauthenticated landing/redirect.
-- **Three Discovery Tabs:**
-  1. **REVIEWS:** Renders [ReviewFeed.tsx](file:///d:/gglog/gglog/components/discover/ReviewFeed.tsx), consuming live data from `GET /api/reviews/discover`.
-  2. **FEED:** Renders [FollowingFeed.tsx](file:///d:/gglog/gglog/components/discover/FollowingFeed.tsx), consuming live activity from `GET /api/activity/feed`.
-  3. **PLAYERS:** Renders [PlayerGrid.tsx](file:///d:/gglog/gglog/components/discover/PlayerGrid.tsx), consuming user search from `GET /api/users/search`.
-- **Spotlight Banner:** [ReviewSpotlight.tsx](file:///d:/gglog/gglog/components/discover/ReviewSpotlight.tsx) highlights community reviews.
-- **Mock Data Elimination:** The discover subsystem has successfully eradicated mock data and runs on 100% genuine database and IGDB queries.
+### 8.2 Migration History Verification
+The `prisma/migrations` directory contains four ordered migrations verified by `migration_lock.toml`:
+1. `20260821190000_baseline`: Full schema initialization for Users, Profiles, Games, Genres, Platforms, LogEntries, Reviews, Lists, Watchlists, Follows, ReviewLikes, Comments, Activities, Accounts, and Sessions.
+2. `20260821200056_add_notification_model`: Creation of the `Notification` table and foreign key relations.
+3. `20260822000000_add_ws_ticket`: Creation of the `WsTicket` table for single-use token exchange.
+4. `20260904160000_add_notification_created_at_index`: Creation of index `Notification_createdAt_idx` on `Notification(createdAt)`.
+
+### 8.3 High-Traffic Index Analysis
+- **`Notification` Model:**
+  - `@@index([userId, createdAt])`: Optimizes user notification list queries.
+  - `@@index([userId, read])`: Optimizes unread count badge queries.
+  - `@@index([createdAt])`: **Critical for Render polling.** Enables index range scans for `createdAt > lastPollTime`.
+- **`WsTicket` Model:**
+  - `@@unique([token])`: Fast single-row lookups during handshake.
+  - `@@index([expiresAt])`: Efficient batch deletion for the 5-minute cleanup job.
+- **`Follow` Model:**
+  - `@@id([followerId, followingId])`: Prevents duplicate follow relations at the database level.
+  - `@@index([followerId])` and `@@index([followingId])`: Accelerates bidirectional social graph lookups.
+- **`LogEntry` Model:**
+  - `@@index([userId, playedAt])`: Fast user diary chronology.
+  - `@@index([gameId, playedAt])`: Fast game-specific play logs.
+
+### 8.4 Identified Concurrency Defect
+In `lib/services/gameService.ts:37-82`:
+`getOrCreateGame` executes `prisma.game.findUnique({ where: { igdbId } })`. If `null`, it fetches IGDB and runs `prisma.game.create(...)`. Because `igdbId` is marked `@unique`, two concurrent users logging an un-cached game simultaneously will trigger a Prisma `P2002` Unique Constraint Violation for the second user, failing their request with HTTP 400.
 
 ---
 
-## Section 10 — Profile Subsystem & Mock Data Contamination Audit
+## 9. Render WebSocket Server Audit
 
-### 1. Dynamic User Profile (`/dashboard/profile/[username]`)
-- **File:** [app/dashboard/profile/[username]/page.tsx](file:///d:/gglog/gglog/app/dashboard/profile/%5Busername%5D/page.tsx)
-- **Status:** **80% Production Ready.** Fetches live user profile data, aggregates (games logged, reviews count, followers count, following count), and embeds `DiaryTimeline`.
+### 9.1 Server Lifecycle & Configuration (`server/ws.ts`)
+- **Port Resolution:** Lines 57–60 dynamically read `process.env.PORT ?? process.env.WS_PORT ?? '3001'`. Correctly handles Render's dynamic port assignment.
+- **Network Binding:** Binds strictly to `0.0.0.0` (required for Render container routing).
+- **Health Check Endpoint:** Lines 266–275 implement HTTP `GET /health` responding with HTTP 200 `{ status: 'ok', connectedUsers: N }`.
+- **Allowed Origins:** Lines 83–97 parse `WS_ALLOWED_ORIGINS` (comma-delimited).
+  - *Risk:* If `WS_ALLOWED_ORIGINS` is not defined in the Render dashboard, it defaults to `localhost:3000`, which immediately rejects all production connections from Vercel.
 
-### 2. Main Dashboard Profile (`/dashboard`) — HIGH SEVERITY MOCK CONTAMINATION
-- **File:** [app/dashboard/page.tsx](file:///d:/gglog/gglog/app/dashboard/page.tsx)
-- **Status:** **Mock Contaminated.**
-  - Imports `MOCK_PROFILE_STATS`, `MOCK_PLAYER_STATS`, `MOCK_BIO_QUOTE`, and `MOCK_COLLECTIONS` from `data/mockProfile.ts`.
-  - While the `DIARY` tab connects to `/api/diary`, tabs for **REVIEWS**, **LISTS**, **WATCHLIST**, and **ACTIVITY** are stubbed out with `PlaceholderTab` rendering `"// MODULE PENDING DEPLOYMENT"`.
-  - A real user logging in sees hardcoded mock statistics ("1,420 Games Logged", "Level 42", etc.) rather than their own profile stats.
+### 9.2 Handshake & Authentication
+1. **Ticket Lookup:** Checks `?ticket=<token>` query parameter.
+2. **Validation:** Executes `prisma.wsTicket.findUnique({ where: { token } })`. Checks `used === false` and `expiresAt > new Date()`.
+3. **Single-Use Consumption:** Sets `used: true` immediately upon authentication.
+4. **Fallback:** If ticket is omitted, attempts cookie-based authentication for local development.
 
-### 3. Broken Routes in Profile Navigation
-- Direct navigation to `/dashboard/profile` yields a **404 Not Found** because only the parameterized route `[username]` exists.
-- In [ReviewCard.tsx](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx#L177), the diary link points to `/dashboard/diary`, which is a **dead 404 link** (the diary is a tab on `/dashboard`).
+### 9.3 Polling Loop & Neon Resource Protection
+- **Sequential Execution:** Lines 533–540 implement an asynchronous sequential `while (!isShuttingDown)` loop with `await sleep(WS_POLL_INTERVAL_MS)`. Overlapping queries are impossible.
+- **Connected-User Optimization:** Polling executes **only** when `connectionManager.connectedUserCount > 0`. When zero users are connected, the database is queried zero times.
+- **Batching & Watermarks:** Limits queries to `take: 100` and advances `lastPollTime` to the timestamp of the newest retrieved record.
+- **In-Memory Deduplication:** Tracks delivered notification IDs in a Set capped at 10,000 entries.
+
+### 9.4 Graceful Shutdown & Cleanup
+- Handles `SIGTERM` and `SIGINT` cleanly.
+- Closes the HTTP server, clears keepalive intervals, closes all client sockets with code 1001 ("Server shutting down"), disconnects the Prisma Client, and exits with code 0.
+- A background timer runs every 5 minutes deleting expired and used tickets from `WsTicket`.
 
 ---
 
-## Section 11 — Realtime Notification Subsystem Audit
-
-### End-to-End Notification Lifecycle
+## 10. Realtime Notification Architecture
 
 ```
-User Action (Follow / Like / Comment)
-       │
-       ▼
-Vercel API Route Handler
-       │
-       ▼
-lib/services/notificationService.ts
-       │
-       ▼
-INSERT INTO "Notification" (userId, actorId, type, read = false, createdAt = now)
-       │
-       ▼ (Every 2000ms polling loop)
-Render WebSocket Server (server/ws.ts)
-       │ Queries: SELECT FROM "Notification" WHERE "createdAt" > lastPollTime
-       │ Finds match for connected user
-       ▼
-WebSocket Connection (server/ws.ts -> client socket)
-       │ Dispatches JSON: { type: 'NOTIFICATION', data: notification }
-       ▼
-Client Browser (lib/notifications/notificationSocket.ts)
-       │ Receives message event & parses JSON envelope
-       ▼
-components/providers/NotificationProvider.tsx
-       │ Increments unreadCount state & appends notification to list
-       ▼
-components/notifications/NotificationBell.tsx
-       │ Badge counter updates & toast notification triggers
+User A (Actor)                 Vercel API                  Neon DB               Render WS               User B (Recipient)
+      |                             |                         |                      |                        |
+      | 1. Follow / Like / Comment  |                         |                      |                        |
+      +---------------------------->|                         |                      |                        |
+      |                             | 2. Persist Social Event |                      |                        |
+      |                             |    + Notification       |                      |                        |
+      |                             +------------------------>|                      |                        |
+      |                             |                         |                      |                        |
+      | 3. HTTP 200 OK              |                         |                      |                        |
+      |<----------------------------+                         |                      |                        |
+      |                                                       |                      |                        |
+      |                                                       | 4. Sequential Poll   |                        |
+      |                                                       |    (createdAt > mark)|                        |
+      |                                                       |<---------------------+                        |
+      |                                                       |                      |                        |
+      |                                                       | 5. Return new rows   |                        |
+      |                                                       +--------------------->|                        |
+      |                                                       |                      |                        |
+      |                                                       |                      | 6. Match recipient     |
+      |                                                       |                      |    connected sockets   |
+      |                                                       |                      |                        |
+      |                                                       |                      | 7. WS JSON Frame       |
+      |                                                       |                      +----------------------->|
+      |                                                       |                      |                        |
+      |                                                       |                      |                        | 8. Bell Badge++
+      |                                                       |                      |                        |    Toast Display
 ```
 
-### Verification of All Three Triggers
-1. **FOLLOW:** Verified. `followUser()` in `followService.ts` creates `NotificationType.FOLLOW`.
-2. **LIKE:** Verified. `likeReview()` in `reviewLikeService.ts` creates `NotificationType.REVIEW_LIKE`.
-3. **COMMENT:** Verified. `createComment()` in `commentService.ts` creates `NotificationType.REVIEW_COMMENT`.
+### End-to-End Resilience
+- **Multi-Tab Support:** `NotificationConnectionManager` stores sockets as `Map<string, Set<WebSocket>>()`. If a user opens 3 tabs, all 3 receive notifications simultaneously.
+- **Reconnection Logic:** `lib/notifications/notificationSocket.ts:208-222` implements exponential backoff from 1s to 30s. Reconnections automatically request a fresh ticket before attempting a new handshake.
+- **Database Source of Truth:** If a WebSocket message fails to send, the notification remains in the Neon database. When the user reloads or navigates, the state hydrates via `GET /api/notifications`.
 
 ---
 
-## Section 12 — Standalone WebSocket Server Architecture (`server/ws.ts`)
+## 11. WebSocket Ticket Handshake
 
-[server/ws.ts](file:///d:/gglog/gglog/server/ws.ts) is a dedicated Node.js service designed to run on Render.
-
-### Codebase Audit Breakdown
-- **HTTP Server & Port Binding:**
-  - Binds to `0.0.0.0` using `process.env.PORT || process.env.WS_PORT || 3001`.
-  - Compatible with Render's dynamic `PORT` environment variable.
-- **Health Check Endpoint:**
-  - `GET /health` responds with `HTTP 200` and `{ status: 'ok', connectedUsers: count }`.
-  - Verified working in production at `https://gglog-ws.onrender.com/health`.
-- **CORS & Origin Validation:**
-  - Parses allowed origins from `process.env.WS_ALLOWED_ORIGINS`.
-  - Defaults to `['http://localhost:3000', 'http://127.0.0.1:3000']` if unset. **If omitted on Render, it will reject connections from Vercel.**
-- **Ticket Authentication:**
-  - Extracts `?ticket=TOKEN` from the WebSocket upgrade request URL.
-  - Queries `WsTicket` table in Neon, checks expiration (`expiresAt > now`) and `used === false`.
-  - Immediately marks `used = true` in the database to prevent replay attacks.
-- **Connection Management & Multi-Tab Support:**
-  - Maintains `Map<string, Set<WebSocket>>` mapping a single `userId` to multiple open browser tabs.
-  - Broadcasts notifications to all active tabs of the recipient.
-- **Heartbeat & Zombie Connection Cleanup:**
-  - Pings all connected sockets every 30 seconds. Sockets failing to respond with `pong` are terminated.
-- **Graceful Shutdown:**
-  - Hooks `SIGINT` and `SIGTERM` to clear polling intervals, close sockets, and disconnect Prisma.
-- **CRITICAL FLAW — Neon Polling Load:**
-  - Polling every 2000ms without an index on `createdAt` executes full table scans on Neon serverless PostgreSQL, keeping compute endpoints continuously awake.
-
----
-
-## Section 13 — Client-Side WebSocket Integration & Reconnection Audit
-
-Implemented in [lib/notifications/notificationSocket.ts](file:///d:/gglog/gglog/lib/notifications/notificationSocket.ts) and [components/providers/NotificationProvider.tsx](file:///d:/gglog/gglog/components/providers/NotificationProvider.tsx).
-
-### Lifecycle & Mechanics
-- **Connection Initialization:** Initialized inside `NotificationProvider` only when `user` is non-null in `AuthContext`. Unauthenticated visitors never initiate connections.
-- **Ticket Acquisition:** Calls `POST /api/auth/ws-ticket` to obtain a fresh ticket before initiating the WebSocket handshake.
-- **Reconnection with Exponential Backoff:** If the socket closes, reconnects after an exponential delay (1s, 2s, 4s, 8s, up to 30s maximum).
-- **Flaw in Reconnection State:** When reconnecting after network dropouts, stale `?ticket=` parameters can remain attached to the URL, causing Render to reject the connection with code 4001 until the page is refreshed.
-
----
-
-## Section 14 — Environment Variables Audit
-
-Audit of all environment variable usages across the application:
-
-| Variable | Used by | Required Locally | Required Vercel | Required Render | Classification | Purpose / Production Value |
-|---|---|---|---|---|---|---|
-| **DATABASE_URL** | Prisma, Next.js, `server/ws.ts` | Yes | Yes | Yes | Secret | Neon PostgreSQL connection string (must use pooled endpoint). |
-| **TWITCH_CLIENT_ID** | `lib/idgb/auth.ts` | Yes | Yes | No | Secret / Config | Twitch developer application client ID for IGDB API. |
-| **IGDB_ACCESS_TOKEN** | `lib/idgb/auth.ts` | Yes | Yes | No | Secret | Static Twitch OAuth access token (temporary; expires every ~60 days). |
-| **TWITCH_CLIENT_SECRET**| *Missing in code* | Required | Required | No | Secret | **MISSING.** Needed to implement automated OAuth2 token exchange. |
-| **NEXT_PUBLIC_WS_URL** | `notificationSocket.ts` | Optional | Yes | No | Public URL | Public WebSocket endpoint (e.g., `wss://gglog-ws.onrender.com`). |
-| **PORT** | `server/ws.ts` | Optional | No | Yes | Config | Port assigned dynamically by Render runtime. |
-| **WS_PORT** | `server/ws.ts` | Optional | No | Optional | Config | Fallback local WebSocket port (default: `3001`). |
-| **WS_ALLOWED_ORIGINS** | `server/ws.ts` | Optional | No | Yes | Config | Comma-separated list of allowed frontend origins (e.g. Vercel domain). |
-| **WS_POLL_INTERVAL_MS**| `server/ws.ts` | Optional | No | Optional | Config | Notification polling interval in milliseconds (default: `2000`). |
-| **NODE_ENV** | Next.js, Auth cookies | Optional | Yes | Yes | Config | Runtime environment (`development` / `production`). Controls cookie Secure flag. |
+```
+Browser (Vercel Origin)                   Next.js API (Vercel)                    Neon DB                     WebSocket Server (Render)
+         |                                         |                                 |                                    |
+         | 1. POST /api/auth/ws-ticket             |                                 |                                    |
+         |    (Cookie: gglog_session)              |                                 |                                    |
+         +---------------------------------------->|                                 |                                    |
+         |                                         | 2. Verify session cookie        |                                    |
+         |                                         |    Generate random UUID token   |                                    |
+         |                                         |                                 |                                    |
+         |                                         | 3. INSERT INTO WsTicket         |                                    |
+         |                                         |    (token, userId, 60s TTL)     |                                    |
+         |                                         +-------------------------------->|                                    |
+         |                                         |                                 |                                    |
+         | 4. HTTP 200 { ticket: "uuid-token" }    |                                 |                                    |
+         |<----------------------------------------+                                 |                                    |
+         |                                                                           |                                    |
+         | 5. wss://render-ws.onrender.com?ticket=uuid-token                         |                                    |
+         |    (Origin: https://gglog.vercel.app)                                     |                                    |
+         +--------------------------------------------------------------------------------------------------------------->|
+         |                                                                           |                                    |
+         |                                                                           |                                    | 6. Check Origin in
+         |                                                                           |                                    |    WS_ALLOWED_ORIGINS
+         |                                                                           |                                    |
+         |                                                                           | 7. SELECT * FROM WsTicket          |
+         |                                                                           |    WHERE token = ticket            |
+         |                                                                           |<-----------------------------------+
+         |                                                                           |                                    |
+         |                                                                           | 8. Return record                   |
+         |                                                                           +----------------------------------->|
+         |                                                                           |                                    |
+         |                                                                           |                                    | 9. Assert !used &&
+         |                                                                           |                                    |    expiresAt > now
+         |                                                                           |                                    |
+         |                                                                           | 10. UPDATE WsTicket                |
+         |                                                                           |     SET used = true                |
+         |                                                                           |<-----------------------------------+
+         |                                                                           |                                    |
+         | 11. WS Upgrade 101 Switching Protocols                                   |                                    |
+         |     { type: "connected", payload: { userId } }                            |                                    |
+         |<---------------------------------------------------------------------------------------------------------------+
+```
 
 ---
 
-## Section 15 — Localhost & Hardcoded Network Address Audit
+## 12. Environment Variables Audit
 
-Full scan of network addresses and URLs across application code:
-
-| Location | Hardcoded Value | Classification | Architectural Impact |
-|---|---|---|---|
-| [app/auth/page.tsx:38](file:///d:/gglog/gglog/app/auth/page.tsx#L38) | `http://localhost` | 1. Legitimate Dev / Utility | Used as a dummy base for parsing relative redirect paths in open-redirect defense. Safe. |
-| [lib/idgb/client.ts:3](file:///d:/gglog/gglog/lib/idgb/client.ts#L3) | `https://api.igdb.com/v4` | 3. External API Endpoint | Official IGDB production API endpoint. Legitimate. |
-| [lib/notifications/notificationSocket.ts:45](file:///d:/gglog/gglog/lib/notifications/notificationSocket.ts#L45) | `ws://localhost:3001` | 5. Dangerous Fallback | Fallback if `NEXT_PUBLIC_WS_URL` is undefined. In production, missing env var causes silent failure. |
-| [server/ws.ts:80-81](file:///d:/gglog/gglog/server/ws.ts#L80-L81) | `http://localhost:3000`, `http://127.0.0.1:3000` | 2. Production-Breaking Risk | Default allowed origins in `server/ws.ts`. If `WS_ALLOWED_ORIGINS` is not set on Render, Vercel clients are blocked. |
-| [server/ws.ts:231](file:///d:/gglog/gglog/server/ws.ts#L231) | `localhost` | 1. Legitimate Utility | Fallback host for parsing incoming HTTP request URLs in health check. Safe. |
-| [server/ws.ts:577](file:///d:/gglog/gglog/server/ws.ts#L577) | `http://0.0.0.0:${WS_PORT}/health` | 3. Documentation / Logging | Console output log on server boot. Safe. |
-
----
-
-## Section 16 — Vercel Production Readiness Assessment
-
-### Overall Rating: READY WITH WARNINGS
-
-### Evaluation Details
-- **TypeScript Compilation:** Passed. `npx tsc --noEmit` exits with status code 0.
-- **Prisma Client Generation:** Configured properly; output target `src/generated/prisma` is imported consistently.
-- **Serverless API Boundaries:** Clean separation. No Node-only modules (fs, path) are imported into client components.
-- **Database Connection Management:** Prisma is instantiated globally via `globalThis.prisma` with `@prisma/adapter-neon`.
-- **Warnings & Blockers:**
-  1. `IGDB_ACCESS_TOKEN` will expire, crashing search and logging.
-  2. Mock data on `/dashboard` exposes unready UI to users upon login.
-  3. Orphaned routes (`List` and `Watchlist`) represent incomplete product features.
+| Variable | Target Host | Required? | Exposed to Browser? | Purpose | Expected Production Value | Risk if Missing / Misconfigured |
+|---|---|:---:|:---:|---|---|---|
+| `DATABASE_URL` | Vercel & Render | **Yes** | No | Pooled connection string to Neon PostgreSQL | `postgresql://...@...-pooler.postgres.neon.tech/neondb?sslmode=require` | 🔴 **Critical:** Total backend & WS crash. Database operations fail. |
+| `DIRECT_URL` | Vercel / CLI | **Yes** | No | Direct unpooled connection string for Prisma CLI migrations | `postgresql://...@...postgres.neon.tech/neondb?sslmode=require` | 🔴 **Critical:** Prisma CLI migrations cannot run. |
+| `TWITCH_CLIENT_ID` | Vercel | **Yes** | No | Client ID registered in Twitch Developer Console | Alphanumeric Twitch Client ID string | 🔴 **Critical:** IGDB game search and logging fail completely. |
+| `TWITCH_CLIENT_SECRET` | Vercel | **Yes** | No | Client Secret registered in Twitch Developer Console | Alphanumeric Twitch Secret string | 🔴 **Critical:** Twitch OAuth2 token exchange fails. |
+| `NEXT_PUBLIC_WS_URL` | Vercel (Client) | **Yes** | **Yes** | Public WebSocket URL for browser client connections | `wss://<your-render-service>.onrender.com` | 🔴 **Critical:** Browser defaults to `ws://localhost:3001`; realtime notifications fail silently. |
+| `WS_ALLOWED_ORIGINS` | Render | **Yes** | No | Comma-separated list of allowed browser origins | `https://<your-vercel-domain>.vercel.app` | 🔴 **Critical:** Render rejects all browser WebSocket connections with 403 Forbidden. |
+| `PORT` | Render | Auto | No | Operating system port injected by Render container | Automatically supplied by Render | 🟡 Port binding failure if server tries to hardcode port. (Code correctly falls back to `PORT`). |
+| `WS_PORT` | Render (Local) | No | No | Fallback local development port | `3001` | 🟢 None (defaults to 3001). |
+| `WS_POLL_INTERVAL_MS`| Render | No | No | Interval between database notification poll cycles | `3000` | 🟢 None (defaults to 3000ms). |
+| `NODE_ENV` | Vercel & Render | Auto | Both | Environment mode indicator | `production` | 🟠 If not `production`, session cookies omit the `Secure` flag. |
 
 ---
 
-## Section 17 — Render WebSocket Readiness Assessment
+## 13. Vercel Production Readiness
 
-### Overall Rating: READY WITH WARNINGS
+### 13.1 Build Verification
+- **TypeScript Static Analysis:** Executed `npx tsc --noEmit`. Exited with **Code 0** (zero compilation errors).
+- **Next.js Production Build:** Executed `npm run build`. Next.js 16.3.0 compiled successfully with Turbopack in **24.4s**. All 25 routes generated cleanly.
 
-### Evaluation Details
-- **Process Binding & Port:** Verified. Listens on `0.0.0.0` with `process.env.PORT`.
-- **Verified Fact:** `https://gglog-ws.onrender.com/health` currently returns `{"status":"ok","connectedUsers":0}`.
-- **Start Command:** `npm run ws:start` runs `tsx server/ws.ts`.
-- **Warnings & Blockers:**
-  1. Continuous 2000ms database polling prevents Neon compute from idling and scales poorly.
-  2. If `WS_ALLOWED_ORIGINS` is not configured with the Vercel production domain, WebSocket upgrade handshakes will be rejected with HTTP 403 Forbidden.
-
----
-
-## Section 18 — Complete Backend API Route Inventory
-
-Comprehensive inventory of all 26 backend route handlers:
-
-| HTTP Method | Route Path | Auth Required | Request Validation | Service Handler | Primary DB Models | Frontend Consumer | Status |
-|---|---|---|---|---|---|---|---|
-| **POST** | `/api/auth/signup` | No | Zod (email, username, password) | Inline `lib/auth.ts` | `User`, `Profile`, `Session` | `app/auth/page.tsx` | Production Ready |
-| **POST** | `/api/auth/signin` | No | Zod (identifier, password) | Inline `lib/auth.ts` | `User`, `Session` | `app/auth/page.tsx` | Production Ready |
-| **POST** | `/api/auth/logout` | Yes | Cookie verification | Inline `lib/auth.ts` | `Session` | `Navbar.tsx` | Production Ready |
-| **GET** | `/api/auth/me` | Optional | Cookie verification | Inline `lib/auth.ts` | `User`, `Profile` | `AuthContext.tsx` | Production Ready |
-| **POST** | `/api/auth/ws-ticket` | Yes | `requireAuth()` | Inline Handler | `WsTicket` | `NotificationProvider.tsx` | Production Ready |
-| **GET** | `/api/games/search` | No | Query param `q` | `lib/idgb/games.ts` | External IGDB | `GameSearchModal.tsx`, `/dashboard/log` | Working (Token Risk) |
-| **POST** | `/api/games/log` | Yes | Zod (rating, status, etc.) | `lib/services/gameService.ts` | `Game`, `LogEntry`, `Review`, `Activity` | `app/dashboard/log/page.tsx` | Production Ready |
-| **GET** | `/api/diary` | Yes | Query (cursor, limit) | Inline Prisma | `LogEntry`, `Game`, `Review` | `DiaryTimeline.tsx` | Production Ready |
-| **GET** | `/api/reviews/discover` | Yes | Query (cursor, limit) | `lib/services/reviewService.ts` | `Review`, `Game`, `User` | `ReviewFeed.tsx` | Production Ready |
-| **GET** | `/api/reviews/[reviewId]` | Optional | Route param `reviewId` | `lib/services/reviewService.ts` | `Review`, `Game`, `User` | Single review view | Production Ready |
-| **POST** | `/api/reviews/[reviewId]/like` | Yes | Route param `reviewId` | `lib/services/reviewLikeService.ts`| `ReviewLike`, `Notification` | `ReviewCard.tsx` | Production Ready |
-| **DELETE**| `/api/reviews/[reviewId]/like` | Yes | Route param `reviewId` | `lib/services/reviewLikeService.ts`| `ReviewLike` | `ReviewCard.tsx` | Production Ready |
-| **GET** | `/api/reviews/[reviewId]/comments` | Optional| Route param `reviewId` | `lib/services/commentService.ts` | `Comment`, `User` | `CommentSection.tsx` | Production Ready |
-| **POST** | `/api/reviews/[reviewId]/comments` | Yes | Zod (content 1-2000 chars) | `lib/services/commentService.ts` | `Comment`, `Notification` | `CommentSection.tsx` | Production Ready |
-| **DELETE**| `/api/comments/[commentId]` | Yes | Route param `commentId` | `lib/services/commentService.ts` | `Comment` | `CommentSection.tsx` | Production Ready |
-| **GET** | `/api/activity/feed` | Yes | Query (cursor, limit) | `lib/services/feedService.ts` | `Activity`, `Follow`, `User` | `FollowingFeed.tsx` | Partial (Schema Defect) |
-| **GET** | `/api/feed` | Yes | Query (cursor, limit) | `lib/services/feedService.ts` | `Activity`, `Follow`, `User` | None (Duplicate) | Redundant Duplicate |
-| **GET** | `/api/users/search` | Yes | Query param `q` | `lib/services/userService.ts` | `User`, `Profile` | `PlayerGrid.tsx` | Production Ready |
-| **GET** | `/api/users/[username]` | Optional| Route param `username` | `lib/services/userService.ts` | `User`, `Profile` | `app/dashboard/profile/[username]`| Production Ready |
-| **POST** | `/api/users/[username]/follow` | Yes | Route param `username` | `lib/services/followService.ts` | `Follow`, `Activity`, `Notification`| `ProfileHeader.tsx`, `PlayerCard` | Production Ready |
-| **DELETE**| `/api/users/[username]/follow` | Yes | Route param `username` | `lib/services/followService.ts` | `Follow` | `ProfileHeader.tsx`, `PlayerCard` | Production Ready |
-| **GET** | `/api/users/[username]/followers`| No | Query (cursor, limit) | `lib/services/followService.ts` | `Follow`, `User` | `FollowListModal.tsx` | Production Ready |
-| **GET** | `/api/users/[username]/following`| No | Query (cursor, limit) | `lib/services/followService.ts` | `Follow`, `User` | `FollowListModal.tsx` | Production Ready |
-| **GET** | `/api/notifications` | Yes | Query (unreadOnly, limit) | `lib/services/notificationService.ts`| `Notification` | `NotificationList.tsx` | Production Ready |
-| **GET** | `/api/notifications/unread-count`| Yes | `requireAuth()` | `lib/services/notificationService.ts`| `Notification` | `NotificationBell.tsx` | Production Ready |
-| **PATCH** | `/api/notifications/read-all` | Yes | `requireAuth()` | `lib/services/notificationService.ts`| `Notification` | `NotificationPanel.tsx` | Production Ready |
-| **PATCH** | `/api/notifications/[id]/read` | Yes | Route param `id` | `lib/services/notificationService.ts`| `Notification` | `NotificationItem.tsx` | Production Ready |
-| **DELETE**| `/api/notifications/[id]` | Yes | Route param `id` | `lib/services/notificationService.ts`| `Notification` | `NotificationItem.tsx` | Production Ready |
-| **GET** | `/api/test-igdb` | No | None | Inline test | None | Test Utility | Test Endpoint |
+### 13.2 Deployment Blockers (Identified)
+1. **ESLint Failure:** Executed `npm run lint`. Exited with **Code 1** (769 errors, 4,871 warnings).
+   - *Cause 1:* `eslint.config.mjs` does not exclude `src/generated/**`. ESLint attempts to lint the auto-generated Prisma Client files.
+   - *Cause 2:* 39 JSX syntax errors exist in application components (unescaped `//` comments inside JSX text nodes in `components/sections/` and temporal dead-zone hook access in `components/ui/CountUpNumber.tsx`).
+   - *Impact:* If Vercel has ESLint verification enabled during deployment (default behavior), the build will fail immediately.
+2. **Missing `postinstall` Script:** `package.json` contains no `"postinstall": "prisma generate"`. While Prisma Client code is currently committed to Git, any deployment environment that deletes untracked generated files during install will fail to compile.
 
 ---
 
-## Section 19 — Complete Frontend Component & Page Inventory
+## 14. Render Production Readiness
 
-| Component / Page | Location | Purpose | API Endpoints Consumed | Mock Data Usage | Auth Required | Production Status |
-|---|---|---|---|---|---|---|
-| **Marketing Landing** | [app/page.tsx](file:///d:/gglog/gglog/app/page.tsx) | Product landing page | None | Static showcase | No | Production Ready |
-| **Auth Page** | [app/auth/page.tsx](file:///d:/gglog/gglog/app/auth/page.tsx) | Login & registration | `/api/auth/signin`, `/api/auth/signup` | None | No | Production Ready |
-| **User Dashboard** | [app/dashboard/page.tsx](file:///d:/gglog/gglog/app/dashboard/page.tsx) | Main player overview | `/api/diary` | **Heavy Mock Data** (`MOCK_PROFILE_STATS`, `MOCK_COLLECTIONS`) | Yes | **Mock Contaminated** |
-| **Game Logging** | [app/dashboard/log/page.tsx](file:///d:/gglog/gglog/app/dashboard/log/page.tsx) | Game search & logging | `/api/games/search`, `/api/games/log` | None | Yes | Production Ready |
-| **Discover Page** | [app/dashboard/discover/page.tsx](file:///d:/gglog/gglog/app/dashboard/discover/page.tsx) | Reviews, feed & players | `/api/reviews/discover`, `/api/activity/feed`, `/api/users/search` | None | Yes | Production Ready |
-| **Public Profile** | [app/dashboard/profile/[username]/page.tsx](file:///d:/gglog/gglog/app/dashboard/profile/%5Busername%5D/page.tsx) | Player profile & stats | `/api/users/[username]`, `/api/users/[username]/follow` | None | Optional | Production Ready |
-| **Review Card** | [components/discover/ReviewCard.tsx](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx) | Review display & likes | `/api/reviews/[reviewId]/like` | None | Optional | UI Defect (No stars) |
-| **Comment Drawer** | [components/discover/CommentSection.tsx](file:///d:/gglog/gglog/components/discover/CommentSection.tsx) | Review discussion | `/api/reviews/[reviewId]/comments`, `/api/comments/[id]` | None | Optional | Production Ready |
-| **Following Feed** | [components/discover/FollowingFeed.tsx](file:///d:/gglog/gglog/components/discover/FollowingFeed.tsx) | Activity stream | `/api/activity/feed` | None | Yes | Partial (Schema Defect) |
-| **Player Grid** | [components/discover/PlayerGrid.tsx](file:///d:/gglog/gglog/components/discover/PlayerGrid.tsx) | Player discovery search | `/api/users/search` | None | Yes | Production Ready |
-| **Notification Bell** | [components/notifications/NotificationBell.tsx](file:///d:/gglog/gglog/components/notifications/NotificationBell.tsx) | Header bell & counter | `NotificationProvider` | None | Yes | Production Ready |
-| **Notification Panel**| [components/notifications/NotificationPanel.tsx](file:///d:/gglog/gglog/components/notifications/NotificationPanel.tsx) | Dropdown notification list | `/api/notifications/read-all` | None | Yes | Production Ready |
-| **Diary Timeline** | [components/profile/DiaryTimeline.tsx](file:///d:/gglog/gglog/components/profile/DiaryTimeline.tsx) | Personal gaming log | `/api/diary` | Fallback only | Yes | Production Ready |
-| **Followers Modal** | [components/profile/FollowListModal.tsx](file:///d:/gglog/gglog/components/profile/FollowListModal.tsx) | Follower/Following list | `/api/users/[username]/followers`, `.../following` | None | Optional | Production Ready |
+### 14.1 Configuration Verification
+- **Start Command:** `npm run ws` executes `tsx server/ws.ts`.
+- **Runtime Dependency:** `tsx` is correctly listed under `"dependencies"` in `package.json:24`, ensuring it is installed in Render production environments.
+- **Port Binding:** Dynamically resolves `process.env.PORT` before fallback.
+- **Health Check:** `GET /health` responds with HTTP 200 and JSON status.
+
+### 14.2 Free-Tier Sleep Consideration
+Render free instances spin down after 15 minutes of inactivity. When a client reconnects, the HTTP/WS wake-up can take 30–50 seconds.
+- *Mitigation in Code:* `lib/notifications/notificationSocket.ts` implements exponential backoff reconnection. If Render is waking up, the browser retries at 1s, 2s, 4s, 8s, 16s, and 30s until connection succeeds.
 
 ---
 
-## Section 20 — Comprehensive Security & Vulnerability Audit
+## 15. Frontend Functional Audit
 
-Each vulnerability is classified according to standard security severity levels:
-
-### [CRITICAL] 1. Static IGDB Bearer Token in Environment
-- **Vector:** [lib/idgb/auth.ts](file:///d:/gglog/gglog/lib/idgb/auth.ts#L3-L15)
-- **Risk:** Twitch OAuth app tokens expire every ~60 days. There is no automated refresh mechanism. When the token expires, every game search and logging operation will fail with 401 Unauthorized, taking down core application functionality.
-
-### [HIGH] 2. Absent Rate Limiting on Authentication & Search Endpoints
-- **Vector:** `/api/auth/signin`, `/api/auth/signup`, and `/api/games/search`
-- **Risk:** No IP rate limiting or request throttling is applied. Attackers can execute automated brute-force password spraying on user accounts and flood IGDB API quotas.
-
-### [HIGH] 3. Database Connection Exhaustion via Render Polling Bridge
-- **Vector:** [server/ws.ts](file:///d:/gglog/gglog/server/ws.ts#L210-L260)
-- **Risk:** Un-indexed query running every 2000ms against Neon PostgreSQL. Keeps compute awake 24/7 and risks exhausting Neon connection limits during traffic spikes.
-
-### [MEDIUM] 4. Open Allowed Origins Fallback on WebSocket Server
-- **Vector:** [server/ws.ts](file:///d:/gglog/gglog/server/ws.ts#L79-L82)
-- **Risk:** If `WS_ALLOWED_ORIGINS` is not explicitly configured on Render, the server defaults to localhost origins, immediately rejecting production WebSocket handshakes from Vercel.
-
-### [MEDIUM] 5. `WsTicket` Table Storage Bloat
-- **Vector:** [prisma/schema.prisma](file:///d:/gglog/gglog/prisma/schema.prisma#L404-L416)
-- **Risk:** Tickets are marked `used: true`, but expired tickets are never purged. Causes continuous, unbounded table growth in PostgreSQL.
-
-### [LOW] 6. Missing `targetUserId` on Activity Feed Schema
-- **Vector:** [prisma/schema.prisma](file:///d:/gglog/gglog/prisma/schema.prisma#L324-L342)
-- **Risk:** Data omission vulnerability forcing client UI to render degraded copy ("user followed someone").
-
-### [INFO] 7. Cryptographically Secure Session Storage
-- **Implementation:** [lib/auth.ts](file:///d:/gglog/gglog/lib/auth.ts) uses SHA-256 token hashing and 12-round bcrypt password hashing. Highly resilient against database dump compromises.
+| Domain | Backend Service | API Route | Frontend UI | Neon DB | Realtime | Production Status | Assessment |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|---|
+| **Landing Page** | N/A | N/A | ✅ Complete | N/A | N/A | 🟢 Ready | Hero, CRT effects, features, animations function properly. |
+| **Authentication** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | 🟢 Ready | Signup, signin, session persistence, and logout function properly. |
+| **Password Reset** | ❌ Missing | ❌ Missing | 🔴 Fake | ❌ Missing | N/A | 🔴 Broken | Fake simulation only. Must be disabled or hidden for beta. |
+| **Game Search** | ✅ Complete | ✅ Complete | ✅ Complete | N/A | N/A | 🟠 Warning | Works, but vulnerable to Apicalypse double-quote syntax error. |
+| **Game Logging** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | 🟢 Ready | Star ratings, tags, status, replay toggle, and review creation work. |
+| **Reviews Feed** | ✅ Complete | ✅ Complete | 🟡 Partial | ✅ Complete | N/A | 🟡 Partial | Feed displays reviews, but star ratings are omitted from the cards. |
+| **Review Likes** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | 🟢 Ready | Optimistic like toggling, composite primary key, instant updates. |
+| **Review Comments** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | 🟢 Ready | Threaded comments with instant submission and author deletion. |
+| **Follow System** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | 🟢 Ready | Follow/unfollow, optimistic counts, follower list modals. |
+| **User Search** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | 🟢 Ready | Case-insensitive search on username and display name. |
+| **Discover Feed** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | 🟢 Ready | Switches between People, Community Reviews, and Following feed. |
+| **User Profile** | ✅ Complete | ✅ Complete | 🟡 Partial | ✅ Complete | N/A | 🟡 Partial | Profile stats and follow work; archive section displays placeholder. |
+| **User Dashboard** | 🟡 Partial | 🟡 Partial | 🔴 Mocked | ✅ Complete | N/A | 🔴 Not Ready | Displays fake statistics (`MOCK_PROFILE_STATS`) and placeholder tabs. |
+| **Realtime Alerts** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | 🟢 Ready | Realtime toast and bell badge counter via Render WebSocket. |
+| **Watchlist** | 🟡 Service | ❌ Missing | ❌ Missing | ✅ Complete | N/A | ⚫ Orphaned | Backend service exists; no API route or UI components exist. |
+| **Curated Lists** | 🟡 Service | ❌ Missing | ❌ Missing | ✅ Complete | N/A | ⚫ Orphaned | Backend service exists; no API route or UI components exist. |
 
 ---
 
-## Section 21 — Performance, Database Query & Scalability Analysis
+## 16. Mock Data & Incomplete UI Audit
 
-### Must Fix Before Public Beta
-1. **Add `@@index([createdAt])` to Notification Table:**
-   - `server/ws.ts` queries `Notification` with `WHERE "createdAt" > lastPollTime`.
-   - The table only indexes `[userId, createdAt]`. Without `userId`, Postgres performs a full sequential table scan every 2 seconds.
-2. **Switch Neon Connection String to Pooled Endpoint:**
-   - Ensure `DATABASE_URL` uses the `-pooler` domain to leverage PgBouncer connection pooling and prevent connection pool exhaustion from Vercel serverless function scaling.
-
-### Can Optimize Later (Post-Beta)
-1. **Replace WebSocket Database Polling with Redis/Upstash Pub/Sub:**
-   - Transition `server/ws.ts` and Vercel route handlers to publish/subscribe over Upstash Redis. Eliminates Neon database polling entirely.
-2. **Composite Pagination Cursors for Activity Feed:**
-   - The activity feed currently uses single-column cursors. As data scales, migrating to deterministic composite cursors (`createdAt_id`) will ensure zero duplicate or skipped feed items.
-3. **Automated Ticket Pruning:**
-   - Introduce a daily maintenance cron to delete expired `WsTicket` and `Session` rows.
+| # | Issue | File Location | Impact | Severity | Beta Blocker? | Required Action |
+|---|---|---|---|:---:|:---:|---|
+| 1 | Hardcoded Profile Stats on Dashboard | `app/dashboard/page.tsx:26,69` | Dashboard header displays hardcoded fake statistics (`MOCK_PROFILE_STATS`) instead of real DB counts. | **P1** | **YES** | Replace with live fetch from `/api/users/:username`. |
+| 2 | Hardcoded Side Panel on Dashboard | `app/dashboard/page.tsx:133-134` | Renders fake player stats (`MOCK_PLAYER_STATS`) and fake collections. | **P1** | **YES** | Connect to live user data or hide collections panel. |
+| 3 | Placeholder Tabs on Dashboard | `app/dashboard/page.tsx:114-128` | Reviews, Lists, Watchlist, and Activity tabs show `"// MODULE PENDING DEPLOYMENT"`. | **P1** | **NO** | Keep Diary as default active tab; hide unfinished tabs for beta. |
+| 4 | Dead Link on Review Cards | `components/discover/ReviewCard.tsx:177` | Clicking `[ READ ]` navigates to `/dashboard/diary` which produces an HTTP 404 error. | **P0** | **YES** | Update `href` to `/dashboard` or create diary page. |
+| 5 | Missing Star Display on Review Cards | `components/discover/ReviewCard.tsx:28` | `StarDisplay` function is defined but never rendered in the JSX. | **P1** | **YES** | Add `<StarDisplay rating={...} />` into the review card header. |
+| 6 | Placeholder Archive on User Profiles | `app/dashboard/profile/[username]/page.tsx:321-335` | Viewing another user's profile displays `"// MODULE PENDING DEPLOYMENT"` in the main body. | **P1** | **NO** | Render public diary entries or leave note for beta. |
+| 7 | Dead Navbar Anchor Links | `components/profile/ProfileNavbar.tsx:18-19` | Links `GAMES -> #games` and `COMMUNITY -> #community` do not exist on dashboard pages. | **P1** | **NO** | Route to `/dashboard/discover` or remove dead anchors. |
+| 8 | Simulated Password Reset | `app/auth/page.tsx:208-217` | Claims to send password reset links with a fake 1.5s delay. | **P1** | **YES** | Hide the "Forgot Password" link on the auth screen. |
 
 ---
 
-## Section 22 — Current State Implementation Matrix
+## 17. Security Audit
 
-| Feature / Domain | Backend Service | API Route | Frontend UI | Neon Database | Realtime WebSocket | Production Ready | Current Status |
-|---|---|---|---|---|---|---|---|
-| **User Registration & Login** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **Session Security (SHA-256)**| ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **Game Search (IGDB)** | 🟡 Partial | 🟡 Partial | ✅ Complete | ✅ Complete | N/A | ⚠️ Warning | **WORKING (Token Risk)** |
-| **Game Logging (Diary)** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **Ratings & Reviews** | ✅ Complete | ✅ Complete | 🟡 Partial | ✅ Complete | N/A | 🟡 Partial | **MISSING STARS IN UI** |
-| **Review Likes** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Yes | **COMPLETE** |
-| **Review Comments** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Yes | **COMPLETE** |
-| **Follow / Unfollow** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Yes | **COMPLETE** |
-| **Followers / Following Lists**| ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **User Search** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **Community Discover** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **Activity Feed** | 🟡 Partial | 🟡 Partial | 🟡 Partial | 🟡 Partial | N/A | 🟡 Partial | **SCHEMA DEFECT** |
-| **User Profile Page** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | N/A | ✅ Yes | **COMPLETE** |
-| **User Dashboard (`/dashboard`)**| 🟡 Partial | 🟡 Partial | 🧪 Mocked | ✅ Complete | N/A | 🔴 No | **HEAVY MOCK DATA** |
-| **Watchlist Subsystem** | ✅ Complete | 🔴 Missing | 🔴 Missing | ✅ Complete | N/A | 🔴 No | **ORPHANED SERVICE** |
-| **Curated Lists Subsystem** | ✅ Complete | 🔴 Missing | 🔴 Missing | ✅ Complete | N/A | 🔴 No | **ORPHANED SERVICE** |
-| **WebSocket Ticket Handshake** | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Yes | **COMPLETE** |
-| **Realtime Notifications** | ✅ Complete | ✅ Complete | ✅ Complete | ⚠️ Un-indexed| ⚠️ Polling | ⚠️ Warning | **NEON LOAD DEFECT** |
+### 17.1 Structured Findings Classification
 
----
+#### 🔴 Critical Vulnerabilities
+*None identified.* No remote code execution, SQL injection, open database instances, or exposed private credentials were found.
 
-## Section 23 — Exact Remaining Work Prioritization
+#### 🟠 High Severity Issues
+1. **Unescaped IGDB Apicalypse Query Injection:**
+   - *Location:* `lib/idgb/games.ts:87`.
+   - *Description:* Directly interpolating user input into `search "${search}";` allows double-quote characters to corrupt the query string, causing IGDB to return 400 Bad Request and crashing the search route.
+2. **Missing Build Gate on Vercel:**
+   - *Location:* `package.json:5-13`.
+   - *Description:* Lack of `"postinstall": "prisma generate"` leaves production deployments reliant on manually committed generated artifacts.
 
-### MUST DO BEFORE VERCEL (Deployment Blockers)
-1. **Implement Twitch OAuth2 Client-Credentials Flow:**
-   - In `lib/idgb/auth.ts`, exchange `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` for an automated bearer token. Without this, IGDB search will fail when the static token expires.
-2. **Fix Directory Typo:** Rename `lib/idgb` to `lib/igdb` and update import statements.
-3. **Configure Allowed Origins on Render:** Set `WS_ALLOWED_ORIGINS` in the Render environment settings to include the production Vercel domain.
-4. **Enforce Neon Connection Pooling:** Ensure production `DATABASE_URL` targets the pooled Neon connection string.
+#### 🟡 Medium Severity Issues
+1. **Plain-Text Session Tokens in Database:**
+   - *Location:* `lib/auth.ts:70-79`.
+   - *Description:* Session tokens are stored unhashed in Neon. If the database is compromised, active session tokens could be extracted.
+2. **Unauthenticated Test Route:**
+   - *Location:* `app/api/test-igdb/route.ts`.
+   - *Description:* Allows anyone to trigger live IGDB API queries, draining external rate quotas.
+3. **Unthrottled Ticket Creation:**
+   - *Location:* `app/api/auth/ws-ticket/route.ts`.
+   - *Description:* Authenticated users can request unlimited WebSocket tickets in an automated loop.
+4. **Timing Enumeration on Signin:**
+   - *Location:* `app/api/auth/signin/route.ts:46`.
+   - *Description:* Non-existent users return immediately (1ms) while existing users undergo bcrypt comparison (250ms), allowing username enumeration.
 
-### MUST DO BEFORE PUBLIC BETA (Functional Integrity)
-1. **Purge Mock Data from `/dashboard`:**
-   - Replace `MOCK_PROFILE_STATS`, `MOCK_PLAYER_STATS`, and `MOCK_COLLECTIONS` in `app/dashboard/page.tsx` with live queries.
-2. **Fix Broken Navigation Routes:**
-   - Update `ReviewCard.tsx:177` link from `/dashboard/diary` to `/dashboard`.
-   - Add `app/dashboard/profile/page.tsx` redirecting to `/dashboard/profile/[currentUsername]`.
-3. **Add Database Index for WebSocket Polling:**
-   - Add `@@index([createdAt])` to `model Notification` in `prisma/schema.prisma`.
-4. **Render Star Rating in `ReviewCard`:**
-   - Insert `<StarDisplay rating={review.rating} />` in `ReviewCard.tsx`.
-5. **Fix Activity Feed Target User:**
-   - Add `targetUserId` relation to `model Activity` so follow events display who was followed.
+#### 🔵 Low Severity Issues
+1. **Process-Local Rate Limiting on Vercel:**
+   - *Location:* `lib/rate-limit.ts`.
+   - *Description:* Rate limit counters are in-memory Maps and do not synchronize across serverless instances. Acceptable for a 3–5 user beta.
+2. **Untracked Scratch Scripts in Git:**
+   - *Location:* `scratch_delete.ts` and `scratch/`.
+   - *Description:* Maintenance scripts with raw database mutations are checked into the repository.
 
-### SHOULD DO AFTER BETA (Non-Critical Enhancements)
-1. **Activate Orphaned Services (Lists & Watchlist):**
-   - Create API routes in `app/api/lists` and `app/api/watchlist` to connect existing service logic.
-   - Build UI tabs in `/dashboard` to replace `PlaceholderTab`.
-2. **Consolidate Feed Routes:**
-   - Remove redundant `app/api/feed/route.ts` and standardize on `/api/activity/feed`.
-3. **Rate Limiting:**
-   - Add Upstash Ratelimit middleware to auth and search routes.
-4. **Ticket & Session Garbage Collection:**
-   - Schedule a maintenance cron to purge expired `WsTicket` and `Session` rows.
-
-### NICE TO HAVE (Future Roadmap)
-1. **Google OAuth Integration:** Activate `Account` table with NextAuth/Auth.js or custom OAuth flow.
-2. **Redis Pub/Sub Realtime Architecture:** Replace database polling in `server/ws.ts` with Redis pub/sub.
+#### 🟢 Informational Findings
+1. **Zero Raw SQL in Production:** All application queries use Prisma's parameterized engine.
+2. **Zero `dangerouslySetInnerHTML`:** React child string escaping prevents client-side XSS.
+3. **HttpOnly & SameSite Cookies:** Mitigates client script credential theft and cross-site request forgery.
 
 ---
 
-## Section 24 — Top 10 Critical Architectural Findings & Remediation
+## 18. Performance & Scalability Audit
 
-### Finding 1: Static IGDB Access Token & Missing OAuth Flow
-- **Problem:** `lib/idgb/auth.ts` reads a static token from environment variables without implementing token refresh.
-- **Evidence:** [lib/idgb/auth.ts:3-15](file:///d:/gglog/gglog/lib/idgb/auth.ts#L3-L15)
-- **Why It Matters:** Twitch OAuth tokens expire in ~60 days. Game search and logging will permanently crash in production once expired.
-- **Severity:** **CRITICAL (P0)**
-- **Next Action:** Implement automated client-credentials OAuth token exchange against `https://id.twitch.tv/oauth2/token`.
+### 18.1 Beta-Safe Architecture (3–5 Users)
+- **Database Connection Pool:** Prisma utilizes `@prisma/adapter-neon` over pooled connections, preventing connection exhaustion.
+- **WebSocket Polling:** The sequential polling loop halts execution when zero users are connected and batches queries to 100 records. With 3–5 users, total database poll operations will remain well within Neon free-tier CPU limits.
+- **Batching ID Lookups:** Review like statuses and follow statuses are batched using `where: { id: { in: ids } }`, avoiding N+1 database queries.
 
----
-
-### Finding 2: Full Table Scan on Neon via WebSocket DB Polling
-- **Problem:** `server/ws.ts` polls the `Notification` table every 2000ms on `createdAt`, but lacks a standalone index on `createdAt`.
-- **Evidence:** [server/ws.ts:228](file:///d:/gglog/gglog/server/ws.ts#L228) & [prisma/schema.prisma:365](file:///d:/gglog/gglog/prisma/schema.prisma#L365)
-- **Why It Matters:** Neon executes full table scans every 2 seconds, continuously keeping serverless compute awake and exhausting connection limits.
-- **Severity:** **CRITICAL (P0)**
-- **Next Action:** Add `@@index([createdAt])` to `model Notification` in `schema.prisma` and migrate to Redis Pub/Sub post-beta.
+### 18.2 Scalability Bottlenecks (Post-Beta)
+- **In-Memory Feed Slicing Defect:**
+  In `lib/services/feedService.ts:64-111`:
+  The feed service fetches all followed user IDs into memory (`followedIds`), queries activities using `actorId: { in: followedIds }`, slices `limit + 1`, and **then** filters out private reviews in memory. If an active followed user creates multiple private reviews, the query can return empty result pages while claiming `hasMore: true`.
+- **Process-Local Memory:** In-memory token caches and rate limit counters reset whenever serverless instances recycle.
 
 ---
 
-### Finding 3: Heavy Mock Data Contamination on Primary Dashboard
-- **Problem:** `app/dashboard/page.tsx` renders hardcoded mock profile stats and stubbed placeholder tabs.
-- **Evidence:** [app/dashboard/page.tsx:25-30, 67-71, 114-135](file:///d:/gglog/gglog/app/dashboard/page.tsx#L25-L30)
-- **Why It Matters:** Logged-in users see fake data ("1,420 Games Logged", "Level 42") and cannot view their actual review/activity history.
-- **Severity:** **HIGH (P0)**
-- **Next Action:** Bind `/dashboard` to real aggregate database queries and purge `data/mockProfile` imports.
+## 19. Error Handling & Reliability
+
+### 19.1 API Error Normalization
+- All errors pass through `apiError()` in `lib/errors.ts`.
+- Status codes conform to HTTP standards:
+  - `400`: Zod validation failures, malformed JSON.
+  - `401`: Missing or expired session tokens.
+  - `403`: Insufficient ownership permissions.
+  - `404`: Entity not found (or private visibility masking).
+  - `409`: Unique constraints (username taken, self-follow).
+  - `429`: Rate limit exceeded with `Retry-After` header.
+  - `500`: Unhandled server/database exceptions.
+
+### 19.2 WebSocket Error Resilience
+- Database query failures in `server/ws.ts:520-524` are caught and logged; the polling loop continues rather than crashing the Node process.
+- Broken client sockets are closed cleanly and removed from the active connection set.
+- Browser clients catch socket closure and execute exponential backoff reconnection.
 
 ---
 
-### Finding 4: Orphaned Core Services: `List` and `Watchlist`
-- **Problem:** 400+ lines of production-grade service logic in `listService.ts` and `watchlistService.ts` have zero API routes or UI.
-- **Evidence:** [lib/services/listService.ts](file:///d:/gglog/gglog/lib/services/listService.ts) & [lib/services/watchlistService.ts](file:///d:/gglog/gglog/lib/services/watchlistService.ts)
-- **Why It Matters:** Two foundational Letterboxd pillars (Backlog/Watchlist and Curated Lists) are completely missing from the user experience.
-- **Severity:** **HIGH (P1)**
-- **Next Action:** Build route handlers under `app/api/watchlist` and `app/api/lists` and mount UI panels in `/dashboard`.
+## 20. Testing & Verification
+
+### 20.1 Verification Executed During Audit
+- **TypeScript Static Verification:** `npx tsc --noEmit` executed: **Passed (0 errors)**.
+- **Next.js Production Build:** `npm run build` executed: **Passed (0 errors)**.
+- **Rate Limiter Unit Tests:** `npx tsx lib/__tests__/rate-limit.test.ts` executed: **Passed (32/32 tests passed)**.
+- **Prisma Schema & Migrations:** Verified schema syntax and checked migration SQL files.
+- **ESLint Analysis:** `npm run lint` executed: **Failed (Exit Code 1, 769 errors due to `src/generated` inclusion)**.
+
+### 20.2 Test Framework Status
+- **Automated Test Runners:** Neither Jest, Vitest, nor Playwright are installed in `package.json`.
+- **Existing Test Files:** Only `lib/__tests__/rate-limit.test.ts` exists as a standalone runner script.
+- **Automated Coverage:** 0% automated coverage across API routes, UI components, and WebSocket server. Verification currently relies on static analysis, type checking, and manual execution.
 
 ---
 
-### Finding 5: Activity Feed Schema Defect for `FOLLOWED_USER`
-- **Problem:** `model Activity` lacks a `targetUserId` column, discarding the followed user's ID during follow events.
-- **Evidence:** [prisma/schema.prisma:324-342](file:///d:/gglog/gglog/prisma/schema.prisma#L324-L342) & [FollowingFeed.tsx:46](file:///d:/gglog/gglog/components/discover/FollowingFeed.tsx#L46)
-- **Why It Matters:** The activity feed renders degraded text ("username followed someone") because it cannot display who was followed.
-- **Severity:** **MEDIUM (P1)**
-- **Next Action:** Add `targetUserId String? @map("target_user_id")` to `Activity` in `schema.prisma`.
+## 21. Current Implementation Matrix
+
+| Feature | Backend | API | UI | Database | WebSocket | Production Status | Assessment |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|---|
+| **User Registration** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Bcrypt 12 rounds, Zod validation, rate limited. |
+| **User Signin** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | HttpOnly session cookie, rate limited. |
+| **User Signout** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Database session deletion and cookie expiration. |
+| **Password Reset** | 🔴 | 🔴 | 🔴 | 🔴 | — | 🔴 Not Ready | Simulated delay with fake message. Needs removal. |
+| **Game Search (IGDB)** | ✅ | ✅ | ✅ | N/A | — | 🟡 Warning | Functional; double quotes cause syntax error. |
+| **Game Logging** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Transactional logging with rating, status, tags. |
+| **Star Rating Selector** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Interactive 0.5-star precision up to 5.0 stars. |
+| **Ratings on Review Cards**| ✅ | ✅ | 🔴 | ✅ | — | 🔴 Not Ready | `StarDisplay` omitted from JSX; reviews show no stars. |
+| **Review Creation** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Created atomically during game logging. |
+| **Review Updates & Deletes**| 🟡 | 🔴 | 🔴 | ✅ | — | 🔴 Not Ready | Backend functions exist; API routes and UI missing. |
+| **Review Likes / Unlikes** | ✅ | ✅ | ✅ | ✅ | ✅ | 🟢 Ready | Idempotent composite PK with optimistic UI. |
+| **Review Comments** | ✅ | ✅ | ✅ | ✅ | ✅ | 🟢 Ready | Threaded comments with author-only deletion. |
+| **Follow / Unfollow** | ✅ | ✅ | ✅ | ✅ | ✅ | 🟢 Ready | Directed graph with self-follow prevention. |
+| **Followers / Following** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Paginated modal lists with bidirectional status. |
+| **User Search** | ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Case-insensitive search on username and display name. |
+| **Community Discover Feed**| ✅ | ✅ | ✅ | ✅ | — | 🟢 Ready | Displays latest public reviews across all users. |
+| **Social Activity Feed** | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 Warning | Post-slice in-memory filtering flaw. |
+| **User Profile Screen** | ✅ | ✅ | 🟡 | ✅ | — | 🟡 Partial | Header and stats live; archive displays placeholder. |
+| **Profile Editing** | 🔴 | 🔴 | 🔴 | ✅ | — | 🔴 Not Ready | Schema exists; API endpoint and UI missing. |
+| **User Dashboard** | 🟡 | 🟡 | 🧪 | ✅ | — | 🔴 Not Ready | Heavy mock statistics and placeholder tabs. |
+| **Watchlist Subsystem** | 🟡 | 🔴 | 🔴 | ✅ | — | ⚫ Orphaned | Backend service unreferenced by routes or UI. |
+| **Curated Lists Subsystem** | 🟡 | 🔴 | 🔴 | ✅ | — | ⚫ Orphaned | Backend service unreferenced by routes or UI. |
+| **WS Ticket Handshake** | ✅ | ✅ | ✅ | ✅ | ✅ | 🟢 Ready | 60s single-use token authentication. |
+| **Realtime Notifications** | ✅ | ✅ | ✅ | ✅ | ✅ | 🟢 Ready | Sequential DB poll loop delivers to active sockets. |
 
 ---
 
-### Finding 6: Broken Routes & Dead Navigation Links
-- **Problem:** `ReviewCard.tsx` links to nonexistent `/dashboard/diary`, and `/dashboard/profile` throws 404 without a username.
-- **Evidence:** [components/discover/ReviewCard.tsx:177](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx#L177)
-- **Why It Matters:** Users encounter 404 errors during normal site exploration.
-- **Severity:** **MEDIUM (P1)**
-- **Next Action:** Update link target to `/dashboard` and add redirect handler at `app/dashboard/profile/page.tsx`.
+## 22. Remaining Work
+
+### P0 — Must Fix Before Beta (Blockers)
+
+| Priority | Problem | Location | Why It Matters | Required Change | Verification |
+|---|---|---|---|---|---|
+| **P0** | ESLint failure breaks cloud build | `eslint.config.mjs` | Vercel deployments fail if linting produces errors. | Add `"src/generated/**"` to `globalIgnores`; fix JSX comment syntax in sections. | Run `npm run lint` and verify exit code 0. |
+| **P0** | Missing Prisma client generation hook | `package.json` | Cloud deployment builds cannot resolve Prisma Client on clean install. | Add `"postinstall": "prisma generate"` to scripts in `package.json`. | Run `npm run build` in clean environment. |
+| **P0** | 404 Navigation on Review Cards | `components/discover/ReviewCard.tsx:177` | Clicking `[ READ ]` routes to `/dashboard/diary` which does not exist. | Change link target to `/dashboard`. | Click `[ READ ]` in browser and confirm valid navigation. |
+| **P0** | Missing Render Allowed Origin | Render Dashboard | Render rejects all Vercel WebSocket connections with 403 Forbidden. | Configure `WS_ALLOWED_ORIGINS=https://<vercel-domain>` in Render. | Connect to WS from browser and verify HTTP 101. |
+| **P0** | Missing Vercel WebSocket URL | Vercel Dashboard | Browser tries to connect to `ws://localhost:3001` in production. | Configure `NEXT_PUBLIC_WS_URL=wss://<render-service>` in Vercel. | Inspect browser network tab and confirm connection. |
+
+### P1 — Should Fix During Beta Preparation
+
+| Priority | Problem | Location | Why It Matters | Required Change | Verification |
+|---|---|---|---|---|---|
+| **P1** | Hardcoded mock stats on Dashboard | `app/dashboard/page.tsx:26,69` | Users see fake stats rather than their actual games logged. | Hook `ProfileHeader` to live data from `/api/users/:username`. | Log a game and confirm count increments on dashboard. |
+| **P1** | Star ratings missing on review feed | `components/discover/ReviewCard.tsx:28` | Reviews show text only; rating stars are invisible. | Render `<StarDisplay rating={review.rating} />` in JSX. | Confirm stars appear on Discover review feed. |
+| **P1** | IGDB query syntax error on quotes | `lib/idgb/games.ts:87` | Searching games with double quotes causes a 500 error. | Strip or escape `"` characters in the search string. | Search for `Call of Duty "Modern"` and confirm results. |
+| **P1** | Fake password reset simulation | `app/auth/page.tsx:208-217` | Misleads users into expecting an email that will never arrive. | Remove or disable the "Forgot Password" link for beta. | Confirm link is hidden on `/auth`. |
+| **P1** | Public test endpoint exposed | `app/api/test-igdb/route.ts` | Allows unauthorized users to consume IGDB API quota. | Delete the file `app/api/test-igdb/route.ts`. | Request `/api/test-igdb` and verify 404. |
+| **P1** | Dead navbar anchor links | `components/profile/ProfileNavbar.tsx:18` | Clicking `#games` or `#community` does nothing. | Route to `/dashboard/discover` or remove anchors. | Click navbar links and verify valid navigation. |
+| **P1** | Untracked scratch files in Git | `scratch_delete.ts`, `scratch/` | Unsafe maintenance scripts committed to production repo. | Remove from Git tracking and add to `.gitignore`. | Run `git status` and verify repository is clean. |
+
+### P2 — Post-Beta / Scale Improvements
+
+| Priority | Problem | Location | Why It Matters | Required Change | Verification |
+|---|---|---|---|---|---|
+| **P2** | In-memory post-slice feed filtering | `lib/services/feedService.ts:104` | Can produce empty feed pages with `hasMore: true`. | Filter visibility directly in the SQL query. | Paginate feed with mixed visibility items. |
+| **P2** | Unhashed session tokens in database | `lib/auth.ts:70-79` | Database leak exposes valid session tokens. | Hash tokens with SHA-256 before database insertion. | Verify tokens in DB are 64-char hex strings. |
+| **P2** | Concurrency race on game creation | `lib/services/gameService.ts:54` | Parallel logging of new games can throw `P2002`. | Use `upsert` or catch `P2002` and retry `findUnique`. | Simulate parallel game logging calls. |
+| **P2** | Orphaned Watchlist and Lists | `lib/services/` | Features exist in code but cannot be used by players. | Implement API routes and UI pages post-beta. | Complete functional verification. |
+| **P2** | Process-local rate limiting | `lib/rate-limit.ts` | Serverless scaling bypasses local memory limits. | Migrate to `@upstash/ratelimit` with Redis. | Benchmark rate limits across multiple instances. |
 
 ---
 
-### Finding 7: Duplicated Feed Route Handlers
-- **Problem:** `/api/feed` and `/api/activity/feed` contain identical duplicated code.
-- **Evidence:** [app/api/feed/route.ts](file:///d:/gglog/gglog/app/api/feed/route.ts) vs [app/api/activity/feed/route.ts](file:///d:/gglog/gglog/app/api/activity/feed/route.ts)
-- **Why It Matters:** API surface bloat and risk of divergent maintenance.
-- **Severity:** **LOW (P2)**
-- **Next Action:** Remove `/api/feed` and standardize on `/api/activity/feed`.
+## 23. Beta Launch Checklist
+
+### Code
+- [ ] TypeScript compilation verified (`npx tsc --noEmit` passes).
+- [ ] Production build verified (`npm run build` passes).
+- [ ] ESLint passes without errors (`npm run lint` passes).
+- [ ] `postinstall: prisma generate` added to `package.json`.
+- [ ] `app/api/test-igdb/route.ts` deleted.
+- [ ] Dead link `/dashboard/diary` in `ReviewCard.tsx` updated.
+- [ ] `MOCK_PROFILE_STATS` replaced with live API data on `/dashboard`.
+- [ ] Scratch scripts removed from Git tracking.
+
+### Vercel Deployment
+- [ ] `DATABASE_URL` configured with Neon pooled connection string.
+- [ ] `DIRECT_URL` configured with Neon unpooled connection string.
+- [ ] `TWITCH_CLIENT_ID` configured.
+- [ ] `TWITCH_CLIENT_SECRET` configured.
+- [ ] `NEXT_PUBLIC_WS_URL` configured (`wss://<render-service>.onrender.com`).
+- [ ] Production deployment build succeeds on Vercel dashboard.
+
+### Render Deployment
+- [ ] Standalone service created pointing to `server/ws.ts`.
+- [ ] Build command configured: `npm install`.
+- [ ] Start command configured: `npm run ws`.
+- [ ] `DATABASE_URL` configured with Neon pooled connection string.
+- [ ] `WS_ALLOWED_ORIGINS` configured (`https://<vercel-project>.vercel.app`).
+- [ ] Service health check verifies HTTP 200 on `/health`.
+
+### Neon Database
+- [ ] Database reachable over TLS.
+- [ ] All 4 migrations deployed (`prisma migrate deploy`).
+- [ ] Notification indexes confirmed (`createdAt` and `[userId, createdAt]`).
+
+### Realtime Verification
+- [ ] Browser acquires ticket via `POST /api/auth/ws-ticket`.
+- [ ] WebSocket handshake establishes with code 101.
+- [ ] Notification delivered to recipient within 3 seconds of social action.
+- [ ] Reconnection with exponential backoff verified when network drops.
 
 ---
 
-### Finding 8: `WsTicket` Table Growth Without TTL Cleanup
-- **Problem:** Single-use WebSocket tickets are never deleted from PostgreSQL after expiration.
-- **Evidence:** [prisma/schema.prisma:404-416](file:///d:/gglog/gglog/prisma/schema.prisma#L404-L416)
-- **Why It Matters:** Transient ticket rows accumulate indefinitely, degrading index performance over time.
-- **Severity:** **MEDIUM (P2)**
-- **Next Action:** Implement a scheduled cleanup cron deleting tickets where `expiresAt < NOW() - INTERVAL '1 hour'`.
+## 24. Recommended Beta Testing Protocol
+
+A structured test protocol for **3 to 5 users**:
+
+### Phase 1 — Single User Smoke Test
+1. Register User A (`testuser_a`). Confirm session cookie set and redirection to `/dashboard`.
+2. Open search modal (`Ctrl+K`), search `"Elden Ring"`, and log play with 5 stars and review text.
+3. Confirm game appears in user's Diary feed with correct date and status badge.
+4. Log out. Confirm redirection to `/auth` and inability to access `/dashboard`.
+
+### Phase 2 — Two Concurrent Users
+1. User A logs in on Browser 1. User B logs in on Browser 2.
+2. User B searches for User A in `/dashboard/discover` (People Tab).
+3. User B clicks `+ FOLLOW`. Confirm optimistic UI changes to `✓ FOLLOWING`.
+4. User A's browser must display a realtime notification toast within 3 seconds: *"testuser_b followed you"*. Notification bell badge increments to `1`.
+5. User B navigates to Reviews tab, finds User A's review, clicks `♥` (Like), and posts a comment.
+6. User A's browser must receive realtime like and comment notifications.
+
+### Phase 3 — Edge Cases & Failure Recovery
+1. **Network Disruption:** Disconnect network on User A's machine for 10 seconds, then reconnect. Confirm WebSocket automatically reconnects and fetches a new ticket.
+2. **Multi-Tab Presence:** Open 2 tabs for User A. Trigger an action from User B. Confirm both of User A's tabs receive the notification badge.
+3. **Session Expiration:** Manually delete session row in Neon. Confirm subsequent API calls return 401 and redirect cleanly to `/auth`.
 
 ---
 
-### Finding 9: Missing Star Rating in `ReviewCard`
-- **Problem:** `StarDisplay` component is defined inside `ReviewCard.tsx` but omitted from the rendered output.
-- **Evidence:** [components/discover/ReviewCard.tsx:28-41](file:///d:/gglog/gglog/components/discover/ReviewCard.tsx#L28-L41)
-- **Why It Matters:** Community reviews do not show the star rating awarded to games, compromising core review presentation.
-- **Severity:** **MEDIUM (P1)**
-- **Next Action:** Render `<StarDisplay rating={review.rating} />` inside the review card header.
+## 25. Known Non-Blockers
+
+The following items are explicitly **non-blocking** for the 3–5 user beta:
+1. **In-Memory Rate Limiting:** Sufficient for a trusted closed beta group; distributed Redis is not needed.
+2. **Social Feed Materialization:** In-memory query joins over followed users are completely safe at low volume (<1,000 total rows).
+3. **Watchlist & Curated Lists Subsystems:** Orphaned services can remain inactive without impacting core diary, review, follow, or notification flows.
+4. **Automated E2E Testing Suite:** Manual testing with 3–5 users is sufficient for beta verification.
+5. **Session Token Hashing:** Plain-text UUID tokens in the database are acceptable for an initial closed test.
 
 ---
 
-### Finding 10: Client Reconnection Ticket Failure Loop
-- **Problem:** If a WebSocket disconnects, reconnection logic can retry with an expired ticket query string.
-- **Evidence:** [lib/notifications/notificationSocket.ts:109-135](file:///d:/gglog/gglog/lib/notifications/notificationSocket.ts#L109-L135)
-- **Why It Matters:** Reconnection attempts fail with code 4001 until the user performs a hard page refresh.
-- **Severity:** **MEDIUM (P1)**
-- **Next Action:** Ensure a fresh ticket is fetched on every reconnect attempt and strip stale query parameters.
+## 26. Post-Beta Roadmap
+
+### Phase 1 — Stabilization & Hardening (Immediate Post-Beta)
+- Migrate process-local rate limiting to `@upstash/ratelimit` with Redis.
+- Implement SHA-256 hashing for stored session tokens.
+- Add database `upsert` handling in `getOrCreateGame` to prevent unique constraint race conditions.
+- Implement review editing (`PATCH`) and review deletion (`DELETE`).
+
+### Phase 2 — Feature Parity & Orphan Activation
+- Implement API routes and UI tabs for the Watchlist subsystem.
+- Implement API routes and UI tabs for Curated Game Lists.
+- Build profile customization UI (avatar upload, bio editing, display name).
+
+### Phase 3 — Scale & Observability
+- Move social activity feed filtering entirely into database queries.
+- Add structured logging and APM monitoring (e.g., Sentry, OpenTelemetry).
+- Introduce Vitest and Playwright test automation into the CI/CD pipeline.
 
 ---
 
-## Architectural Verdict & Production Sign-Off
+## 27. Final Beta Readiness Assessment
 
-The GGLOG codebase demonstrates sophisticated architectural foundations. Its relational schema, transactional operations, SHA-256 session management, and cursor pagination patterns reflect high software engineering standards. 
+## Current Status
 
-However, **deploying the application in its current state will lead to immediate production failure modes**:
-1. Search and logging will crash upon IGDB token expiration.
-2. Neon PostgreSQL compute and connection limits will be severely stressed by un-indexed 2000ms WebSocket polling.
-3. Authenticated users will be presented with hardcoded mock statistics on their primary dashboard.
+**🟡 NEARLY READY — 3 BLOCKERS REMAIN**
 
-Executing the prioritized 4-phase remediation plan (starting with Milestone 1: IGDB OAuth flow, Neon indexing, and dashboard mock data elimination) will transition GGLOG into a scalable, high-performance, and production-ready gaming social platform.
+### What is working
+- Core game logging and diary persistence.
+- IGDB v4 search with automatic Twitch OAuth2 caching and 401 recovery.
+- Social interactions (directed follows, review likes, threaded comments).
+- Realtime notification delivery via cross-origin WebSocket ticket handshakes.
+- TypeScript compilation and Next.js Turbopack production build.
 
-**Audit Completed:** September 4, 2026  
-**Status:** READ-ONLY AUDIT COMPLETE — COMPILED TO [AUDIT_REPORT.md](file:///d:/gglog/gglog/AUDIT_REPORT.md)
+### What is fixed
+- Static IGDB token vulnerability completely eliminated.
+- Render sequential notification polling loop with zero-user idle bypass.
+- `Notification(createdAt)` database indexing confirmed in schema and migrations.
+- Bcrypt 12-round password hashing and secure HttpOnly cookie transport.
+
+### What remains
+- Fixing ESLint configuration to ignore `src/generated/**` and repairing JSX comment syntax.
+- Adding `"postinstall": "prisma generate"` to `package.json`.
+- Fixing dead link `/dashboard/diary` in `ReviewCard.tsx` and replacing dashboard mock statistics with live data.
+- Aligning `NEXT_PUBLIC_WS_URL` on Vercel and `WS_ALLOWED_ORIGINS` on Render.
+
+### What blocks beta
+The 3 critical items in Section 22 (P0) must be resolved to ensure deployment builds succeed on Vercel and users do not encounter dead links.
+
+### What can wait
+Distributed Redis, feed SQL optimizations, password reset emails, watchlist/lists activation, and session token hashing can safely be deferred to post-beta phases.
+
+---
+
+## 28. Appendix — Important Files
+
+### Authentication & Security
+- `lib/auth.ts`: Core session creation, validation, cookie management, and user sanitization.
+- `lib/auth-constants.ts`: Shared session cookie names and TTL constants.
+- `lib/rate-limit.ts`: In-memory fixed-window rate limiter with IP extraction.
+- `app/api/auth/signup/route.ts`: Registration endpoint with bcrypt hashing.
+- `app/api/auth/signin/route.ts`: Login endpoint with credential verification.
+- `app/api/auth/logout/route.ts`: Session cleanup endpoint.
+- `app/api/auth/me/route.ts`: Session verification endpoint.
+- `app/api/auth/ws-ticket/route.ts`: Short-lived single-use WebSocket ticket issuer.
+
+### External IGDB & Twitch Integration
+- `lib/idgb/auth.ts`: Twitch OAuth2 client credentials flow, token caching, and stampede lock.
+- `lib/idgb/client.ts`: Central IGDB v4 Apicalypse client with 401 automatic retry.
+- `lib/idgb/games.ts`: IGDB game search query builder and detail lookup.
+- `lib/services/gameService.ts`: Local database game caching and relation persistence.
+
+### Realtime & WebSocket Server
+- `server/ws.ts`: Standalone Render WebSocket server, ticket verification, and sequential DB polling loop.
+- `lib/wsEmitter.ts`: In-memory event emitter for local development.
+- `lib/notifications/notificationSocket.ts`: Browser WebSocket client with exponential backoff.
+- `components/providers/NotificationProvider.tsx`: React state context managing realtime notifications.
+- `components/notifications/NotificationBell.tsx`: Interactive bell badge and notification tray.
+
+### Database & Schema
+- `prisma/schema.prisma`: Authoritative database datamodel and index definitions.
+- `prisma.config.ts`: Prisma CLI configuration binding direct connection strings.
+- `prisma/migrations/`: Ordered migration history tracking baseline, notifications, tickets, and indexes.
+
+### Core API Handlers
+- `app/api/games/search/route.ts`: IGDB search proxy with rate limiting.
+- `app/api/games/log/route.ts`: Transactional game play logging and review creation.
+- `app/api/diary/route.ts`: Authenticated user diary retrieval with offset pagination.
+- `app/api/reviews/discover/route.ts`: Public community review feed.
+- `app/api/reviews/[reviewId]/like/route.ts`: Review like/unlike endpoint.
+- `app/api/reviews/[reviewId]/comments/route.ts`: Review comment listing and creation.
+- `app/api/users/[username]/follow/route.ts`: Social follow/unfollow endpoint.
+- `app/api/users/search/route.ts`: User directory search.
+- `app/api/notifications/route.ts`: Paginated user notifications retrieval.
+
+### Frontend Pages & Critical Components
+- `app/page.tsx`: Retro-futuristic landing page.
+- `app/auth/page.tsx`: Tabbed signup and login interface.
+- `app/dashboard/page.tsx`: Authenticated player diary and dashboard.
+- `app/dashboard/discover/page.tsx`: Community discovery hub (People, Reviews, Following).
+- `app/dashboard/log/page.tsx`: Full game logging composer with 5-star rating selector.
+- `app/dashboard/profile/[username]/page.tsx`: Public player profile screen.
+- `components/discover/ReviewCard.tsx`: Community review presentation card.
+
+---
+
+**Audit Status:** COMPLETE  
+**Document Type:** Beta Production Readiness Report  
+**Scope:** GGLOG Application  
+**Prepared From:** Verified repository inspection and implementation audit

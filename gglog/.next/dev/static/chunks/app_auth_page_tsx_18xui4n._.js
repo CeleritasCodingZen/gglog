@@ -63,6 +63,40 @@ const FORM_TRANSITION = {
 };
 /* ============================================
    Component
+   ============================================ */ /* ============================================
+   OAuth error → user-facing message map
+   ============================================ */ const OAUTH_ERROR_MESSAGES = {
+    oauth_denied: {
+        title: "AUTH CANCELLED_",
+        sub: "GOOGLE SIGN-IN WAS DENIED_"
+    },
+    missing_code: {
+        title: "AUTH FAILURE_",
+        sub: "MISSING AUTHORIZATION CODE_"
+    },
+    invalid_state: {
+        title: "SESSION EXPIRED_",
+        sub: "PLEASE TRY AGAIN_"
+    },
+    token_exchange_failed: {
+        title: "AUTH FAILURE_",
+        sub: "GOOGLE TOKEN EXCHANGE FAILED_"
+    },
+    invalid_token: {
+        title: "AUTH FAILURE_",
+        sub: "INVALID GOOGLE TOKEN_"
+    },
+    account_conflict: {
+        title: "ACCOUNT CONFLICT_",
+        sub: "GOOGLE ACCOUNT ALREADY LINKED_"
+    },
+    server_error: {
+        title: "SYSTEM ERROR_",
+        sub: "TRY AGAIN LATER_"
+    }
+};
+/* ============================================
+   Component
    ============================================ */ function AuthPageContent() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
@@ -83,6 +117,35 @@ const FORM_TRANSITION = {
         password: "",
         confirmPassword: ""
     });
+    /* ---- Show OAuth error from callback redirect ---- */ const oauthError = searchParams.get("error");
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AuthPageContent.useEffect": ()=>{
+            if (oauthError && authStatus === "idle") {
+                const msg = OAUTH_ERROR_MESSAGES[oauthError] || OAUTH_ERROR_MESSAGES.server_error;
+                setAuthStatus("error");
+                setStatusMsg(msg);
+                // Clear the error from the URL without a full navigation
+                const url = new URL(window.location.href);
+                url.searchParams.delete("error");
+                window.history.replaceState({}, "", url.toString());
+                // Auto-dismiss after 4 seconds
+                const timer = setTimeout({
+                    "AuthPageContent.useEffect.timer": ()=>{
+                        setAuthStatus("idle");
+                        setStatusMsg({
+                            title: "",
+                            sub: ""
+                        });
+                    }
+                }["AuthPageContent.useEffect.timer"], 4000);
+                return ({
+                    "AuthPageContent.useEffect": ()=>clearTimeout(timer)
+                })["AuthPageContent.useEffect"];
+            }
+        }
+    }["AuthPageContent.useEffect"], [
+        oauthError
+    ]); // eslint-disable-line react-hooks/exhaustive-deps
     const [touched, setTouched] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const [showPasswords, setShowPasswords] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     /* ---- Redirect if already authenticated ---- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -353,29 +416,16 @@ const FORM_TRANSITION = {
         setUser
     ]);
     const handleGoogleAuth = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "AuthPageContent.useCallback[handleGoogleAuth]": async ()=>{
+        "AuthPageContent.useCallback[handleGoogleAuth]": ()=>{
             if (authStatus === "loading") return;
-            setAuthStatus("loading");
-            await new Promise({
-                "AuthPageContent.useCallback[handleGoogleAuth]": (resolve)=>setTimeout(resolve, 1800)
-            }["AuthPageContent.useCallback[handleGoogleAuth]"]);
-            setAuthStatus("success");
-            setStatusMsg({
-                title: "ACCESS GRANTED_",
-                sub: "GOOGLE PLAYER IDENTIFIED_"
-            });
-            setTimeout({
-                "AuthPageContent.useCallback[handleGoogleAuth]": ()=>{
-                    setAuthStatus("idle");
-                    setStatusMsg({
-                        title: "",
-                        sub: ""
-                    });
-                }
-            }["AuthPageContent.useCallback[handleGoogleAuth]"], 3000);
+            // Navigate to the Google OAuth initiation endpoint.
+            // Pass the intended redirect target so we return there after auth.
+            const url = redirectTo !== "/dashboard" ? `/api/auth/google?next=${encodeURIComponent(redirectTo)}` : "/api/auth/google";
+            window.location.href = url;
         }
     }["AuthPageContent.useCallback[handleGoogleAuth]"], [
-        authStatus
+        authStatus,
+        redirectTo
     ]);
     /* ---- Button text ---- */ const getButtonText = ()=>{
         if (authStatus === "loading") {
@@ -403,7 +453,7 @@ const FORM_TRANSITION = {
                     children: label
                 }, void 0, false, {
                     fileName: "[project]/app/auth/page.tsx",
-                    lineNumber: 359,
+                    lineNumber: 393,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -421,7 +471,7 @@ const FORM_TRANSITION = {
                             "aria-label": label.replace("_", "")
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 363,
+                            lineNumber: 397,
                             columnNumber: 11
                         }, this),
                         isPassword && formData[field] && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -433,13 +483,13 @@ const FORM_TRANSITION = {
                             children: showPasswords[field] ? "HIDE" : "SHOW"
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 375,
+                            lineNumber: 409,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/auth/page.tsx",
-                    lineNumber: 362,
+                    lineNumber: 396,
                     columnNumber: 9
                 }, this),
                 validation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -447,13 +497,13 @@ const FORM_TRANSITION = {
                     children: validation.message
                 }, void 0, false, {
                     fileName: "[project]/app/auth/page.tsx",
-                    lineNumber: 389,
+                    lineNumber: 423,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/auth/page.tsx",
-            lineNumber: 358,
+            lineNumber: 392,
             columnNumber: 7
         }, this);
     };
@@ -471,7 +521,7 @@ const FORM_TRANSITION = {
                         children: "GGLOG"
                     }, void 0, false, {
                         fileName: "[project]/app/auth/page.tsx",
-                        lineNumber: 416,
+                        lineNumber: 450,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -479,13 +529,13 @@ const FORM_TRANSITION = {
                         children: "GGLOG // ARCHIVE SYSTEM"
                     }, void 0, false, {
                         fileName: "[project]/app/auth/page.tsx",
-                        lineNumber: 419,
+                        lineNumber: 453,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/auth/page.tsx",
-                lineNumber: 415,
+                lineNumber: 449,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -502,7 +552,7 @@ const FORM_TRANSITION = {
                             "aria-hidden": "true"
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 435,
+                            lineNumber: 469,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -511,7 +561,7 @@ const FORM_TRANSITION = {
                             children: "AUTH_0x7F2::NODE"
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 441,
+                            lineNumber: 475,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -522,7 +572,7 @@ const FORM_TRANSITION = {
                                     children: "SYS://GGLOG/AUTH"
                                 }, void 0, false, {
                                     fileName: "[project]/app/auth/page.tsx",
-                                    lineNumber: 450,
+                                    lineNumber: 484,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -532,7 +582,7 @@ const FORM_TRANSITION = {
                                             children: "■"
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 454,
+                                            lineNumber: 488,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -543,32 +593,32 @@ const FORM_TRANSITION = {
                                                     children: "_"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 457,
+                                                    lineNumber: 491,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 455,
+                                            lineNumber: 489,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/auth/page.tsx",
-                                    lineNumber: 453,
+                                    lineNumber: 487,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 449,
+                            lineNumber: 483,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "h-px bg-[#1a1a1a] auth-boot-3"
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 463,
+                            lineNumber: 497,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -598,7 +648,7 @@ const FORM_TRANSITION = {
                                             children: "◆"
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 478,
+                                            lineNumber: 512,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -606,7 +656,7 @@ const FORM_TRANSITION = {
                                             children: statusMsg.title
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 479,
+                                            lineNumber: 513,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -614,13 +664,13 @@ const FORM_TRANSITION = {
                                             children: statusMsg.sub
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 482,
+                                            lineNumber: 516,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, "status-success", true, {
                                     fileName: "[project]/app/auth/page.tsx",
-                                    lineNumber: 470,
+                                    lineNumber: 504,
                                     columnNumber: 17
                                 }, this) : authStatus === "error" ? /* ──────── ERROR STATE ──────── */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                     initial: {
@@ -645,7 +695,7 @@ const FORM_TRANSITION = {
                                             children: "✕"
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 496,
+                                            lineNumber: 530,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -653,7 +703,7 @@ const FORM_TRANSITION = {
                                             children: statusMsg.title
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 497,
+                                            lineNumber: 531,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -661,13 +711,13 @@ const FORM_TRANSITION = {
                                             children: statusMsg.sub
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 500,
+                                            lineNumber: 534,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, "status-error", true, {
                                     fileName: "[project]/app/auth/page.tsx",
-                                    lineNumber: 488,
+                                    lineNumber: 522,
                                     columnNumber: 17
                                 }, this) : /* ──────── FORM ──────── */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                     ...FORM_ANIM,
@@ -678,7 +728,7 @@ const FORM_TRANSITION = {
                                             children: "/// NEW PLAYER"
                                         }, void 0, false, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 513,
+                                            lineNumber: 547,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -693,7 +743,7 @@ const FORM_TRANSITION = {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 519,
+                                                    lineNumber: 553,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -701,13 +751,13 @@ const FORM_TRANSITION = {
                                                     "aria-hidden": "true"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 524,
+                                                    lineNumber: 558,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 518,
+                                            lineNumber: 552,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -719,7 +769,7 @@ const FORM_TRANSITION = {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 527,
+                                            lineNumber: 561,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -742,13 +792,13 @@ const FORM_TRANSITION = {
                                                             children: "FORGOT ACCESS?_"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 545,
+                                                            lineNumber: 579,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 537,
+                                                    lineNumber: 571,
                                                     columnNumber: 23
                                                 }, this),
                                                 mode === "signup" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -771,7 +821,7 @@ const FORM_TRANSITION = {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 557,
+                                                    lineNumber: 591,
                                                     columnNumber: 23
                                                 }, this),
                                                 mode === "forgot" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -781,7 +831,7 @@ const FORM_TRANSITION = {
                                                     })
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 580,
+                                                    lineNumber: 614,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -793,18 +843,18 @@ const FORM_TRANSITION = {
                                                         children: getButtonText()
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/auth/page.tsx",
-                                                        lineNumber: 595,
+                                                        lineNumber: 629,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 589,
+                                                    lineNumber: 623,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 534,
+                                            lineNumber: 568,
                                             columnNumber: 19
                                         }, this),
                                         mode !== "forgot" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -816,7 +866,7 @@ const FORM_TRANSITION = {
                                                             className: "auth-or-line"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 603,
+                                                            lineNumber: 637,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -824,20 +874,20 @@ const FORM_TRANSITION = {
                                                             children: "OR"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 604,
+                                                            lineNumber: 638,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "auth-or-line"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 605,
+                                                            lineNumber: 639,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 602,
+                                                    lineNumber: 636,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -851,13 +901,13 @@ const FORM_TRANSITION = {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 608,
+                                                    lineNumber: 642,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 601,
+                                            lineNumber: 635,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -875,13 +925,13 @@ const FORM_TRANSITION = {
                                                             children: "CREATE ACCOUNT_ →"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 628,
+                                                            lineNumber: 662,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 622,
+                                                    lineNumber: 656,
                                                     columnNumber: 23
                                                 }, this),
                                                 mode === "signup" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -896,13 +946,13 @@ const FORM_TRANSITION = {
                                                             children: "SIGN IN_ →"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 640,
+                                                            lineNumber: 674,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 634,
+                                                    lineNumber: 668,
                                                     columnNumber: 23
                                                 }, this),
                                                 mode === "forgot" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -915,47 +965,47 @@ const FORM_TRANSITION = {
                                                             children: "←"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/auth/page.tsx",
-                                                            lineNumber: 651,
+                                                            lineNumber: 685,
                                                             columnNumber: 25
                                                         }, this),
                                                         " BACK TO AUTH_"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/auth/page.tsx",
-                                                    lineNumber: 646,
+                                                    lineNumber: 680,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/auth/page.tsx",
-                                            lineNumber: 620,
+                                            lineNumber: 654,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, `form-${mode}`, true, {
                                     fileName: "[project]/app/auth/page.tsx",
-                                    lineNumber: 506,
+                                    lineNumber: 540,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/auth/page.tsx",
-                                lineNumber: 467,
+                                lineNumber: 501,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/auth/page.tsx",
-                            lineNumber: 466,
+                            lineNumber: 500,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/auth/page.tsx",
-                    lineNumber: 427,
+                    lineNumber: 461,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/auth/page.tsx",
-                lineNumber: 425,
+                lineNumber: 459,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
@@ -965,22 +1015,22 @@ const FORM_TRANSITION = {
                     children: "[ SYSTEM READY ] © 2026 GGLOG_ARCHIVE"
                 }, void 0, false, {
                     fileName: "[project]/app/auth/page.tsx",
-                    lineNumber: 665,
+                    lineNumber: 699,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/auth/page.tsx",
-                lineNumber: 664,
+                lineNumber: 698,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/auth/page.tsx",
-        lineNumber: 413,
+        lineNumber: 447,
         columnNumber: 5
     }, this);
 }
-_s(AuthPageContent, "cqIu8cH9ZaEqXBhnQRWZt1/ypwM=", false, function() {
+_s(AuthPageContent, "0iq3tOeHBVrw2s68Scn7g5XZzoc=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"],
@@ -997,22 +1047,22 @@ function AuthPage() {
                 children: "INITIALIZING SECURE TERMINAL"
             }, void 0, false, {
                 fileName: "[project]/app/auth/page.tsx",
-                lineNumber: 677,
+                lineNumber: 711,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/auth/page.tsx",
-            lineNumber: 676,
+            lineNumber: 710,
             columnNumber: 7
         }, this),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AuthPageContent, {}, void 0, false, {
             fileName: "[project]/app/auth/page.tsx",
-            lineNumber: 682,
+            lineNumber: 716,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/auth/page.tsx",
-        lineNumber: 675,
+        lineNumber: 709,
         columnNumber: 5
     }, this);
 }

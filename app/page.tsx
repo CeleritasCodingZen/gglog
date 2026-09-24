@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   const [bootComplete, setBootComplete] = useState(false);
+  const [showGameContent, setShowGameContent] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
   const handleBootComplete = useCallback(() => {

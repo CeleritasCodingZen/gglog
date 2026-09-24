@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const input = parsed.data
 
-    // 3. Cache game from IGDB
+    // Create a Cache game from IGDB
     let game
     try {
       game = await getOrCreateGame(input.igdbId)

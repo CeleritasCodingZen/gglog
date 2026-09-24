@@ -73,10 +73,10 @@ export function buildPaginatedResult<T extends { id: string; createdAt: Date }>(
   return { items, nextCursor, hasMore }
 }
 
-/**
- * Parse the `cursor` and `limit` from URL search params.
- * Returns safe defaults if values are missing or invalid.
- */
+
+ // Parse the `cursor` and `limit` from URL search params
+ //Returns safe defaults if values are missing or invalid
+
 export function parsePaginationParams(searchParams: URLSearchParams): {
   cursor: CursorPayload | null
   limit: number
@@ -89,3 +89,5 @@ export function parsePaginationParams(searchParams: URLSearchParams): {
 
   return { cursor, limit }
 }
+
+

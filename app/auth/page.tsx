@@ -59,6 +59,24 @@ const FORM_TRANSITION = { duration: 0.22, ease: "easeOut" as const };
    Component
    ============================================ */
 
+/* ============================================
+   OAuth error → user-facing message map
+   ============================================ */
+
+const OAUTH_ERROR_MESSAGES: Record<string, { title: string; sub: string }> = {
+  oauth_denied:           { title: "AUTH CANCELLED_",    sub: "GOOGLE SIGN-IN WAS DENIED_" },
+  missing_code:           { title: "AUTH FAILURE_",      sub: "MISSING AUTHORIZATION CODE_" },
+  invalid_state:          { title: "SESSION EXPIRED_",   sub: "PLEASE TRY AGAIN_" },
+  token_exchange_failed:  { title: "AUTH FAILURE_",      sub: "GOOGLE TOKEN EXCHANGE FAILED_" },
+  invalid_token:          { title: "AUTH FAILURE_",      sub: "INVALID GOOGLE TOKEN_" },
+  account_conflict:       { title: "ACCOUNT CONFLICT_",  sub: "GOOGLE ACCOUNT ALREADY LINKED_" },
+  server_error:           { title: "SYSTEM ERROR_",      sub: "TRY AGAIN LATER_" },
+};
+
+/* ============================================
+   Component
+   ============================================ */
+
 function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -80,6 +98,26 @@ function AuthPageContent() {
     password: "",
     confirmPassword: "",
   });
+
+  /* ---- Show OAuth error from callback redirect ---- */
+  const oauthError = searchParams.get("error");
+  useEffect(() => {
+    if (oauthError && authStatus === "idle") {
+      const msg = OAUTH_ERROR_MESSAGES[oauthError] || OAUTH_ERROR_MESSAGES.server_error;
+      setAuthStatus("error");
+      setStatusMsg(msg);
+      // Clear the error from the URL without a full navigation
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
+      // Auto-dismiss after 4 seconds
+      const timer = setTimeout(() => {
+        setAuthStatus("idle");
+        setStatusMsg({ title: "", sub: "" });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [oauthError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>(
@@ -300,20 +338,16 @@ function AuthPageContent() {
     [authStatus, mode, formData, getValidation, switchMode, router, setUser]
   );
 
-  const handleGoogleAuth = useCallback(async () => {
+  const handleGoogleAuth = useCallback(() => {
     if (authStatus === "loading") return;
-    setAuthStatus("loading");
-    await new Promise((resolve) => setTimeout(resolve, 1800));
-    setAuthStatus("success");
-    setStatusMsg({
-      title: "ACCESS GRANTED_",
-      sub: "GOOGLE PLAYER IDENTIFIED_",
-    });
-    setTimeout(() => {
-      setAuthStatus("idle");
-      setStatusMsg({ title: "", sub: "" });
-    }, 3000);
-  }, [authStatus]);
+    // Navigate to the Google OAuth initiation endpoint.
+    // Pass the intended redirect target so we return there after auth.
+    const url =
+      redirectTo !== "/dashboard"
+        ? `/api/auth/google?next=${encodeURIComponent(redirectTo)}`
+        : "/api/auth/google";
+    window.location.href = url;
+  }, [authStatus, redirectTo]);
 
   /* ---- Button text ---- */
 
